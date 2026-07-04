@@ -90,10 +90,10 @@ offline (< 5 s — SC-003); repetir tema e receber a oferta de reabrir/regenerar
 
 ### Implementation for User Story 2
 
-- [ ] T030 [P] [US2] Implement `app/pages/1_Historico.py`: list_summaries em tabela (tema, data, status, support_overview), abrir via point read, aviso visual p/ `partial` (FR-009/010)
-- [ ] T031 [US2] Add reopen-or-regenerate flow in `app/Home.py`: find_by_slug antes de rodar pipeline; se existir, oferecer reabrir ou gerar nova análise (FR-011)
-- [ ] T032 [P] [US2] Create export script `infra/export_reports.py`: Cosmos → `data/reports/*.json` p/ demo offline (R9) + instrução no README
-- [ ] T033 [US2] Integration test in `tests/integration/test_history.py`: salvar → listar → reabrir com LocalReportRepository; find_by_slug com tema repetido
+- [X] T030 [P] [US2] Implement `app/pages/1_Historico.py`: list_summaries em tabela (tema, data, status, support_overview), abrir via point read, aviso visual p/ `partial` (FR-009/010)
+- [X] T031 [US2] Add reopen-or-regenerate flow in `app/Home.py`: find_by_slug antes de rodar pipeline; se existir, oferecer reabrir ou gerar nova análise (FR-011)
+- [X] T032 [P] [US2] Create export script `infra/export_reports.py`: Cosmos → `data/reports/*.json` p/ demo offline (R9) + instrução no README
+- [X] T033 [US2] Integration test in `tests/integration/test_history.py`: 4/4 passando — salvar → listar → reabrir com LocalReportRepository; find_by_slug com tema repetido; parcial visível no histórico; reabertura sem dependência de rede (Princípio IV)
 
 **Checkpoint**: US1 + US2 funcionam; demo já sobrevive a falha de rede (RADAR_OFFLINE=1)
 

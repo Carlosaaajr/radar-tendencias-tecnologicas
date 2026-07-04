@@ -14,10 +14,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from azure.ai.projects import AIProjectClient  # noqa: E402
 from azure.identity import DefaultAzureCredential  # noqa: E402
 from dotenv import load_dotenv  # noqa: E402
-
-from azure.ai.projects import AIProjectClient  # noqa: E402
 
 load_dotenv()
 

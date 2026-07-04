@@ -33,6 +33,9 @@ python -m streamlit run app/Home.py
 Instruções completas (incluindo modo offline `RADAR_OFFLINE=1`) em
 [`specs/001-radar-tendencias/quickstart.md`](specs/001-radar-tendencias/quickstart.md).
 
+Antes de uma demonstração sem depender de rede: exporte relatórios do Cosmos para
+disco com `python infra/export_reports.py` e defina `RADAR_OFFLINE=1` no `.env`.
+
 ## Como testar
 
 ```bash
