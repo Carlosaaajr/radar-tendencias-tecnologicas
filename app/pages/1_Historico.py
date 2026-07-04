@@ -56,4 +56,5 @@ else:
         if report is None:
             st.error("Relatório não encontrado.")
         else:
+            st.session_state.current_report = report
             render_report(report)

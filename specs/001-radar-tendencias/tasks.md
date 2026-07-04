@@ -108,7 +108,7 @@ por categoria e exibição de divergências (spec US3).
 
 ### Implementation for User Story 3
 
-- [ ] T034 [US3] Implement `app/pages/2_Evidencias.py`: relatório vindo da sessão (fluxo do painel) com fallback para seleção do histórico; lista completa (título, tipo, origem, data, link), filtro por source_type com contagem por categoria, seções com divergence_note destacadas (FR-015)
+- [X] T034 [US3] Implement `app/pages/2_Evidencias.py`: relatório vindo da sessão (fluxo do painel) com fallback para seleção do histórico; lista completa (título, tipo, origem, data, link), filtro por source_type com contagem por categoria, seções com divergence_note destacadas (FR-015). Validado: servidor sobe sem erro (health check OK)
 
 **Checkpoint**: as 3 stories funcionam de forma independente
 
