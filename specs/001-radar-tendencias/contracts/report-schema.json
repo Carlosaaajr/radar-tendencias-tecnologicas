@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "report-schema.json",
+  "title": "Report — Painel Executivo do Radar de Tendências",
+  "description": "Contrato do documento persistido no Cosmos DB e da saída validada do Agente Sintetizador (subconjunto sections). Versão 1.",
+  "type": "object",
+  "required": ["id", "theme", "theme_slug", "created_at", "status", "sections", "evidence"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "schema_version": { "type": "integer", "const": 1 },
+    "theme": { "type": "string", "minLength": 2 },
+    "theme_slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["running", "completed", "partial", "failed"] },
+    "scope_note": { "type": ["string", "null"] },
+    "degraded_sources": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "metrics": { "type": "object" },
+    "sections": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["key", "content_md", "evidence_ids", "is_inference", "support"],
+        "properties": {
+          "key": {
+            "enum": ["definition", "maturity", "applications", "sectors", "players",
+                     "investments", "adoption_signals", "opportunities", "risks", "outlook"]
+          },
+          "content_md": { "type": "string", "minLength": 1 },
+          "evidence_ids": { "type": "array", "items": { "type": "string" } },
+          "is_inference": { "type": "boolean" },
+          "divergence_note": { "type": ["string", "null"] },
+          "support": {
+            "type": "object",
+            "required": ["evidence_count", "source_type_count", "level", "has_divergence"],
+            "properties": {
+              "evidence_count": { "type": "integer", "minimum": 0 },
+              "source_type_count": { "type": "integer", "minimum": 0, "maximum": 5 },
+              "level": { "enum": ["high", "medium", "low", "inference"] },
+              "has_divergence": { "type": "boolean" }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "is_inference": { "const": false } } },
+            "then": { "properties": { "evidence_ids": { "minItems": 1 } } }
+          }
+        ]
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "source_type", "origin", "url", "snippet", "language"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^ev-\\d+$" },
+          "title": { "type": "string", "minLength": 1 },
+          "source_type": { "enum": ["scientific", "market", "news", "corporate", "patent"] },
+          "origin": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "published_at": { "type": ["string", "null"], "format": "date" },
+          "snippet": { "type": "string" },
+          "language": { "type": "string", "minLength": 2, "maxLength": 5 },
+          "perspective": { "type": ["string", "null"] },
+          "citation_count": { "type": ["integer", "null"], "minimum": 0 }
+        }
+      }
+    }
+  }
+}

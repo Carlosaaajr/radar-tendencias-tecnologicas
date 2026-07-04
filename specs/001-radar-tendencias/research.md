@@ -1,0 +1,181 @@
+# Research: Radar de Tendências Tecnológicas
+
+**Date**: 2026-07-03 | **Feature**: 001-radar-tendencias
+
+Todas as incertezas do Technical Context foram resolvidas. Decisões abaixo no formato
+Decision / Rationale / Alternatives.
+
+## R1. Agentes de IA — Azure AI Foundry Agent Service
+
+- **Decision**: Dois agentes criados programaticamente via SDK Python `azure-ai-projects`
+  (`AIProjectClient`) + `azure-ai-agents` (`BingGroundingTool`), autenticação via
+  `DefaultAzureCredential`:
+  - **Agente Coletor**: modelo GPT-4.1 com ferramenta Grounding with Bing Search;
+  - **Agente Sintetizador**: modelo GPT-4.1 sem ferramentas (recebe corpus, devolve JSON
+    do painel), saída estruturada.
+- **Rationale**: Requisito do usuário (agentes no Foundry). O Grounding with Bing Search
+  é a única forma suportada de busca web com citações nativas no Agent Service — devolve
+  URL citations que alimentam o Princípio I (evidência rastreável). Docs oficiais:
+  [Bing grounding tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/bing-tools).
+- **Constraints confirmadas na pesquisa** (revisão octo-cloud-architect, 2026-07-04):
+  - O recurso "Grounding with Bing Search" deve estar no mesmo resource group do projeto
+    Foundry, exige assinatura paga, e a conexão (connection ID) é referenciada na criação
+    do agente.
+  - **A plataforma de agentes "classic" do Foundry está deprecated (retirada em
+    31/03/2027)**. O caminho `azure-ai-agents` + `BingGroundingTool` documentado com
+    exemplos Python estáveis é o da classic; na **nova agents API** o Grounding with
+    Bing Search continua GA e existe também o **Web Search tool** (GA, dispensa recurso
+    Bing separado). Decisão consciente: usar o que o projeto Foundry existente suportar,
+    validado por **spike obrigatório no dia 1** (criar agente com Bing grounding real e
+    conferir formato das URL citations + latência). Migração para a nova API/Web Search
+    tool registrada como evolução futura.
+  - Compatibilidade de modelos difere entre plataformas: na classic, Bing grounding é
+    incompatível com `gpt-4o-mini` e `gpt-5`; na nova API as famílias gpt-4.1/gpt-4o/gpt-5
+    são listadas como suportadas. GPT-4.1 é seguro nos dois cenários — confirmar
+    disponibilidade na região do projeto no spike.
+  - Requer rede normal (sem VPN/Private Endpoint) — ok para MVP.
+  - **Autenticação em produção**: o Foundry exige Entra ID no project endpoint (sem key
+    auth). `DefaultAzureCredential` só funciona no App Service com **Managed Identity
+    system-assigned + role "Azure AI User"** no projeto Foundry — incluído no
+    provisionamento (quickstart).
+- **Alternatives considered**:
+  - *Web search tool* mais novo do Foundry — mantido como plano B; Bing grounding é o
+    caminho documentado com exemplos Python estáveis.
+  - Azure OpenAI direto (sem Agent Service) + SerpAPI/Tavily — rejeitado: viola o
+    requisito de agentes no Foundry e adiciona fornecedor externo.
+  - Semantic Kernel/AutoGen para orquestração — rejeitado: camada extra sem ganho no
+    MVP (Princípio II); orquestração é um pipeline sequencial simples em Python puro.
+
+## R2. Técnica multi-perspectiva (inspirada no STORM)
+
+- **Decision**: O orquestrador instrui o Agente Coletor a gerar **4 perguntas** sobre o
+  tema (uma por perspectiva fixa: técnica, econômica/mercado, industrial/adoção,
+  regulatória/riscos) e responder cada uma com busca groundada; cada resposta traz
+  citações. As perguntas e respostas viram evidências tipadas. Fixado em 4 no MVP para
+  conter latência (SC-001) e custo por análise (Bing grounding cobra por tool call);
+  se o spike do dia 1 medir folga, avaliar 2 runs paralelos de 2-3 perguntas.
+- **Rationale**: Reproduz o núcleo do STORM (perspective-guided question asking) sem
+  importar o framework (dspy/litellm), que conflitaria com o Agent Service e o prazo
+  (Princípio II). Diversifica evidências e é argumento metodológico forte para a banca.
+- **Alternatives considered**: usar o pacote `knowledge-storm` completo — rejeitado
+  (pipeline próprio incompatível com Foundry Agent Service; dependência pesada);
+  busca única sem perspectivas — rejeitado (evidências homogêneas, grau de suporte pobre).
+
+## R3. Fontes acadêmicas determinísticas
+
+- **Decision**: `arXiv API` (XML/Atom, sem chave) + `OpenAlex` (JSON, sem chave,
+  `mailto` recomendado) chamadas diretamente via `httpx` no orquestrador Python.
+  Semantic Scholar fica como fallback documentado (rate limit sem chave é restritivo).
+- **Rationale**: Cobrem "artigos científicos/Google Scholar" do desafio com metadados
+  estruturados (título, autores, data, DOI, contagem de citações → insumo direto do grau
+  de suporte). Sem fricção de credencial. OpenAlex indexa também Nature/ScienceDirect
+  (metadados e abstracts, não texto completo — suficiente para evidências).
+- **Alternatives considered**: Google Scholar scraping — rejeitado (sem API, bloqueio);
+  Semantic Scholar como primário — rejeitado (429 frequente sem chave); apenas arXiv —
+  rejeitado (viés para preprints de CS/física).
+
+## R4. UI e hospedagem
+
+- **Decision**: Streamlit (multipage) no Azure App Service Linux plano B1, deploy via
+  `az webapp up`/GitHub zip deploy, startup command:
+  `python -m streamlit run app/Home.py --server.port 8000 --server.address 0.0.0.0 --server.headless true`.
+  **Always On habilitado** (evita cold start de 30-90 s na demo). Configuração de proxy
+  versionada em `.streamlit/config.toml` (CORS/XSRF se necessário). O documento
+  `status=running` é persistido no início do pipeline e atualizado ao fim — rerun ou
+  queda de WebSocket não perde a execução; `st.session_state` guarda flag para não
+  reiniciar o pipeline em rerun acidental.
+- **Rationale**: Decisão do usuário (Python full + App Service). Startup command é o
+  padrão documentado para Streamlit no App Service Linux
+  ([guia azureossd](https://azureossd.github.io/2024/04/18/Deploying-a-Python-Streamlit-app-to-App-Service-Linux/),
+  [Tech Community](https://techcommunity.microsoft.com/blog/appsonazureblog/deploy-streamlit-on-azure-web-app/4276108)).
+  Streamlit usa Tornado — não usar Gunicorn.
+- **Alternatives considered**: Container Apps — rejeitado pelo usuário (App Service
+  escolhido); Docker custom — desnecessário (runtime Python nativo do App Service basta).
+
+## R5. Persistência
+
+- **Decision**: Azure Cosmos DB serverless (API NoSQL), database `radar`, containers:
+  `reports` (partition key `/theme_slug`) e `evidence` embutida no documento do
+  relatório (não em container separado). SDK `azure-cosmos`.
+- **Rationale**: Relatório é um agregado autocontido lido sempre inteiro (painel +
+  evidências + graus de suporte) → documento único elimina joins e mantém leitura do
+  histórico < 5 s (SC-003). Serverless: custo por RU consumida, ~centavos no volume do
+  MVP (Princípio de custo documentado).
+- **Alternatives considered**: container separado de evidências — rejeitado (leitura
+  sempre conjunta; documento < 2 MB no volume esperado); Blob Storage JSON — rejeitado
+  (sem consulta por campo para o histórico); Table Storage — rejeitado (JSON aninhado
+  ruim).
+
+## R6. Segredos e configuração
+
+- **Decision**: Variáveis de ambiente (App Settings no App Service) no MVP:
+  `PROJECT_ENDPOINT`, `MODEL_DEPLOYMENT_NAME`, `BING_CONNECTION_ID`, `COSMOS_ENDPOINT`,
+  `COSMOS_KEY`. Localmente via `.env` (python-dotenv), `.env` no `.gitignore`.
+  Key Vault + Managed Identity documentados como hardening de produção (avaliação
+  crítica / evolução futura).
+- **Rationale**: Princípio III exige env vars ou Key Vault; App Settings são cifradas em
+  repouso e suficientes para MVP de 1 semana. `DefaultAzureCredential` já prepara a
+  transição para Managed Identity sem mudança de código no acesso ao Foundry.
+- **Alternatives considered**: Key Vault desde o dia 1 — adiado (setup extra sem ganho
+  na demo; anotado como evolução).
+
+## R7. Testes
+
+- **Decision**: `pytest` + `respx` (mock de HTTP para arXiv/OpenAlex) + fixtures JSON.
+  Cobertura obrigatória nos módulos: normalização/deduplicação de evidências, cálculo de
+  grau de suporte, parsing das respostas dos agentes (JSON schema), fallbacks de coleta.
+  Smoke test opcional end-to-end marcado `@pytest.mark.live` (exige credenciais).
+- **Rationale**: Princípio V exige testes nos módulos críticos; mocks mantêm a suíte
+  executável em CI sem credenciais/custos.
+- **Alternatives considered**: VCR/cassettes — rejeitado (respostas de LLM não são
+  determinísticas; fixtures explícitas são mais claras).
+
+## R8. Grau de suporte (algoritmo)
+
+- **Decision**: Por seção do painel: contagem de evidências citadas, nº de tipos de
+  fonte distintos (científica, mercado/consultoria, notícia, corporativa, patente) e
+  flag de divergência (apontada pelo Sintetizador quando fontes conflitam). Classificação
+  exibida: **Alto** (≥4 evidências E ≥2 tipos), **Médio** (2-3 evidências, OU ≥4
+  evidências com menos de 2 tipos), **Baixo** (1), **Inferência** (0 — marcada, sem
+  grau). Regra total: toda combinação (contagem, tipos) tem classificação definida.
+  Computado deterministicamente no orquestrador a partir das citações, não pelo LLM.
+- **Rationale**: FR-005/FR-006/SC-002. Cálculo determinístico é testável e auditável —
+  o LLM apenas cita; quem gradua é código (defesa forte na arguição sobre alucinação).
+- **Alternatives considered**: LLM autoavaliar confiança — rejeitado (não auditável,
+  viés de superconfiança).
+
+## R9. Resiliência de demo — modo offline local (ajuste da revisão de arquitetura)
+
+- **Decision**: Flag `RADAR_OFFLINE=1` troca o `ReportRepository` (Cosmos) por
+  `LocalReportRepository` que lê/grava os mesmos documentos JSON em `data/reports/` no
+  disco. Antes da apresentação, 2-3 relatórios são exportados do Cosmos para o disco;
+  o Streamlit roda no notebook do apresentador se a rede do local cair. Último recurso:
+  export HTML/PDF estático dos relatórios.
+- **Rationale**: O cache no Cosmos não satisfaz o Princípio IV se não houver rede no
+  local — app e banco estão no Azure. Como o repositório é uma interface e a separação
+  `app/` vs `src/radar/` já existe, o custo é ~1 h (achado ALTO da revisão).
+- **Alternatives considered**: confiar só no Cosmos — rejeitado (furo apontado na
+  revisão); demo gravada em vídeo — mantida como redundância de apresentação, não
+  substitui interatividade.
+
+## R10. Controle de abuso de custo (ajuste da revisão de arquitetura)
+
+- **Decision**: Três freios no MVP: (1) **Access Restrictions** no App Service
+  (allowlist de IP; liberado apenas durante a demo); (2) limite de análises/dia no
+  orquestrador (default 10, configurável via `MAX_ANALYSES_PER_DAY`), verificado antes
+  de iniciar o pipeline; (3) **Azure Budget alert** (~US$30/mês) na assinatura + TPM
+  baixo no deployment GPT-4.1.
+- **Rationale**: App público sem auth executando pipeline pago (~US$0,30-0,60/análise)
+  em domínio `*.azurewebsites.net` varrível por bots = risco real de custo (achado ALTO).
+  Usuário único sem auth continua como decisão de produto; os freios custam horas.
+- **Alternatives considered**: Easy Auth (Entra built-in) — plano B de custo zero em
+  código, mas exige validar interferência com WebSocket do Streamlit; adiado para
+  evolução futura junto com multiusuário.
+
+## Sources
+
+- [Use Grounding with Bing Search tools with the agents API — Microsoft Learn](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/bing-tools)
+- [How to use Grounding with Bing Search in Foundry Agent Service — Microsoft Learn](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-grounding?view=foundry-classic)
+- [Deploying a Python Streamlit app to App Service Linux — azureossd](https://azureossd.github.io/2024/04/18/Deploying-a-Python-Streamlit-app-to-App-Service-Linux/)
+- [Deploy Streamlit on Azure Web App — Microsoft Tech Community](https://techcommunity.microsoft.com/blog/appsonazureblog/deploy-streamlit-on-azure-web-app/4276108)
+- [stanford-oval/storm — técnica multi-perspectiva](https://github.com/stanford-oval/storm)
