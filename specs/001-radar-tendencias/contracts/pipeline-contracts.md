@@ -35,10 +35,10 @@ async def run_market_collection(theme: str, *, perspectives: list[str],
                                 timeout_s: float) -> CollectorResult
 ```
 
-- Cria/reusa agente Foundry com `BingGroundingTool` (connection via
-  `BING_CONNECTION_ID`).
+- Cria/reusa agente Foundry (nova agents API, deployment `gpt-5-radar`) com a
+  ferramenta nativa **Web Search tool** — sem connection/recurso externo (R1).
 - Prompt gera **4 perguntas** (uma por perspectiva: `technical`, `economic`,
-  `industrial`, `regulatory` — R2) e responde cada uma com busca groundada.
+  `industrial`, `regulatory` — R2) e responde cada uma com busca web nativa.
 - Converte **URL citations** da resposta em `Evidence` (source_type inferido:
   `market`/`news`/`corporate`/`patent` por heurística de domínio; default `news`).
 - Mesmo contrato de degradação do Collector (falha do Foundry → `degraded=True`).

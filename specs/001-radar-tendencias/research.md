@@ -7,40 +7,46 @@ Decision / Rationale / Alternatives.
 
 ## R1. Agentes de IA — Azure AI Foundry Agent Service
 
-- **Decision**: Dois agentes criados programaticamente via SDK Python `azure-ai-projects`
-  (`AIProjectClient`) + `azure-ai-agents` (`BingGroundingTool`), autenticação via
-  `DefaultAzureCredential`:
-  - **Agente Coletor**: modelo GPT-4.1 com ferramenta Grounding with Bing Search;
-  - **Agente Sintetizador**: modelo GPT-4.1 sem ferramentas (recebe corpus, devolve JSON
+- **Decision** (revisada em 2026-07-04 após provisionamento real — ver "Achados do
+  provisionamento" abaixo): Dois agentes criados programaticamente via SDK Python
+  `azure-ai-projects` (nova agents API), autenticação via `DefaultAzureCredential`:
+  - **Agente Coletor**: modelo `gpt-5-radar` (deployment dedicado de `gpt-5.4-mini`,
+    GlobalStandard, conta `omc-cli`) com a ferramenta nativa **Web Search tool** (GA,
+    sem recurso Azure separado);
+  - **Agente Sintetizador**: mesmo modelo, sem ferramentas (recebe corpus, devolve JSON
     do painel), saída estruturada.
-- **Rationale**: Requisito do usuário (agentes no Foundry). O Grounding with Bing Search
-  é a única forma suportada de busca web com citações nativas no Agent Service — devolve
-  URL citations que alimentam o Princípio I (evidência rastreável). Docs oficiais:
-  [Bing grounding tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/bing-tools).
-- **Constraints confirmadas na pesquisa** (revisão octo-cloud-architect, 2026-07-04):
-  - O recurso "Grounding with Bing Search" deve estar no mesmo resource group do projeto
-    Foundry, exige assinatura paga, e a conexão (connection ID) é referenciada na criação
-    do agente.
-  - **A plataforma de agentes "classic" do Foundry está deprecated (retirada em
-    31/03/2027)**. O caminho `azure-ai-agents` + `BingGroundingTool` documentado com
-    exemplos Python estáveis é o da classic; na **nova agents API** o Grounding with
-    Bing Search continua GA e existe também o **Web Search tool** (GA, dispensa recurso
-    Bing separado). Decisão consciente: usar o que o projeto Foundry existente suportar,
-    validado por **spike obrigatório no dia 1** (criar agente com Bing grounding real e
-    conferir formato das URL citations + latência). Migração para a nova API/Web Search
-    tool registrada como evolução futura.
-  - Compatibilidade de modelos difere entre plataformas: na classic, Bing grounding é
-    incompatível com `gpt-4o-mini` e `gpt-5`; na nova API as famílias gpt-4.1/gpt-4o/gpt-5
-    são listadas como suportadas. GPT-4.1 é seguro nos dois cenários — confirmar
-    disponibilidade na região do projeto no spike.
+- **Rationale**: Requisito do usuário (agentes no Foundry). Web Search tool é nativo da
+  nova agents API, devolve citações de URL (alimenta o Princípio I) e não depende de um
+  recurso `Microsoft.Bing/accounts` pago à parte — elimina o bloqueio de elegibilidade de
+  SKU encontrado nesta assinatura. Docs: [Web search tool](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/web-search).
+- **Achados do provisionamento real (2026-07-04, projeto `omc-cli/omc-ccg-cli`,
+  brazilsouth, resource group `ai-models-resource`)** — invalidam a suposição original
+  de usar GPT-4.1 e motivam esta revisão:
+  1. **GPT-4.1 (2025-04-14) e toda a família GPT-4o estão `Deprecating`** nesta conta —
+     `az cognitiveservices account deployment create` rejeita novos deployments desses
+     modelos (`ServiceModelDeprecating`). Só a família **GPT-5.x está `GenerallyAvailable`**
+     para novo deployment (confirmado via `az cognitiveservices account list-models`,
+     campo `lifecycleStatus`/`deprecation.inference`).
+  2. **O recurso `Microsoft.Bing/accounts` (SKU `G1`, Grounding with Bing Search
+     "classic") não é elegível nesta assinatura** (`SkuNotEligible` — restrição típica de
+     assinaturas PAYG individuais, que normalmente exigem Enterprise Agreement/CSP para
+     esse recurso). Isso fecha de vez o caminho `BingGroundingTool`/classic para este
+     ambiente, independente da questão de compatibilidade de modelo.
+  3. Deployment dedicado `gpt-5-radar` (`gpt-5.4-mini`, versão `2026-03-17`, GA,
+     GlobalStandard, capacidade 10) criado com sucesso — capabilities incluem
+     `agentsV2: true`, confirmando suporte à nova agents API.
+  - **Consequência**: o "spike do dia 1" (antes T006) deixa de ser uma validação de
+    caminho classic-vs-novo — o caminho classic está descartado por bloqueio real de
+    assinatura. O spike agora valida diretamente o Web Search tool com `gpt-5-radar` na
+    nova agents API (formato das citações + latência).
   - Requer rede normal (sem VPN/Private Endpoint) — ok para MVP.
   - **Autenticação em produção**: o Foundry exige Entra ID no project endpoint (sem key
     auth). `DefaultAzureCredential` só funciona no App Service com **Managed Identity
     system-assigned + role "Azure AI User"** no projeto Foundry — incluído no
     provisionamento (quickstart).
 - **Alternatives considered**:
-  - *Web search tool* mais novo do Foundry — mantido como plano B; Bing grounding é o
-    caminho documentado com exemplos Python estáveis.
+  - *BingGroundingTool* (classic ou nova API) — rejeitado: bloqueio real de SKU de
+    assinatura (achado 2 acima), não apenas preferência.
   - Azure OpenAI direto (sem Agent Service) + SerpAPI/Tavily — rejeitado: viola o
     requisito de agentes no Foundry e adiciona fornecedor externo.
   - Semantic Kernel/AutoGen para orquestração — rejeitado: camada extra sem ganho no
@@ -52,7 +58,8 @@ Decision / Rationale / Alternatives.
   tema (uma por perspectiva fixa: técnica, econômica/mercado, industrial/adoção,
   regulatória/riscos) e responder cada uma com busca groundada; cada resposta traz
   citações. As perguntas e respostas viram evidências tipadas. Fixado em 4 no MVP para
-  conter latência (SC-001) e custo por análise (Bing grounding cobra por tool call);
+  conter latência (SC-001) e custo por análise (Web Search tool cobra por chamada de
+  ferramenta, mesma ordem de grandeza de tokens extras no contexto);
   se o spike do dia 1 medir folga, avaliar 2 runs paralelos de 2-3 perguntas.
 - **Rationale**: Reproduz o núcleo do STORM (perspective-guided question asking) sem
   importar o framework (dspy/litellm), que conflitaria com o Agent Service e o prazo
@@ -109,8 +116,9 @@ Decision / Rationale / Alternatives.
 ## R6. Segredos e configuração
 
 - **Decision**: Variáveis de ambiente (App Settings no App Service) no MVP:
-  `PROJECT_ENDPOINT`, `MODEL_DEPLOYMENT_NAME`, `BING_CONNECTION_ID`, `COSMOS_ENDPOINT`,
-  `COSMOS_KEY`. Localmente via `.env` (python-dotenv), `.env` no `.gitignore`.
+  `PROJECT_ENDPOINT`, `MODEL_DEPLOYMENT_NAME` (= `gpt-5-radar`), `COSMOS_ENDPOINT`,
+  `COSMOS_KEY`. Localmente via `.env` (python-dotenv), `.env` no `.gitignore`. Sem
+  variável de conexão Bing — Web Search tool não depende de recurso/conexão externa.
   Key Vault + Managed Identity documentados como hardening de produção (avaliação
   crítica / evolução futura).
 - **Rationale**: Princípio III exige env vars ou Key Vault; App Settings são cifradas em
@@ -164,10 +172,12 @@ Decision / Rationale / Alternatives.
   (allowlist de IP; liberado apenas durante a demo); (2) limite de análises/dia no
   orquestrador (default 10, configurável via `MAX_ANALYSES_PER_DAY`), verificado antes
   de iniciar o pipeline; (3) **Azure Budget alert** (~US$30/mês) na assinatura + TPM
-  baixo no deployment GPT-4.1.
+  baixo no deployment `gpt-5-radar` (capacidade 10, isolado dos demais usos da conta).
 - **Rationale**: App público sem auth executando pipeline pago (~US$0,30-0,60/análise)
   em domínio `*.azurewebsites.net` varrível por bots = risco real de custo (achado ALTO).
-  Usuário único sem auth continua como decisão de produto; os freios custam horas.
+  Usuário único sem auth continua como decisão de produto; os freios custam horas. TPM
+  baixo aplica-se ao deployment `gpt-5-radar` (capacidade 10, isolado do restante da
+  conta `omc-cli` usado por outras ferramentas).
 - **Alternatives considered**: Easy Auth (Entra built-in) — plano B de custo zero em
   código, mas exige validar interferência com WebSocket do Streamlit; adiado para
   evolução futura junto com multiusuário.

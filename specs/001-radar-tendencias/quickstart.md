@@ -17,15 +17,17 @@ cp .env.example .env
 `.env` (nunca commitado):
 
 ```env
-PROJECT_ENDPOINT=https://<foundry-project>.services.ai.azure.com/api/projects/<name>
-MODEL_DEPLOYMENT_NAME=gpt-4.1
-BING_CONNECTION_ID=/subscriptions/.../connections/<bing-grounding-connection>
+PROJECT_ENDPOINT=https://omc-cli.services.ai.azure.com/api/projects/omc-ccg-cli
+MODEL_DEPLOYMENT_NAME=gpt-5-radar
 COSMOS_ENDPOINT=https://<account>.documents.azure.com:443/
 COSMOS_KEY=<primary-key>
 ANALYSIS_BUDGET_SECONDS=360
 MAX_ANALYSES_PER_DAY=10
 # RADAR_OFFLINE=1   # demo offline: repositório em disco (data/reports/) em vez do Cosmos
 ```
+
+Sem variável de conexão Bing: os agentes usam o **Web Search tool** nativo da nova
+agents API (R1) — nenhum recurso externo além do próprio projeto Foundry.
 
 ```bash
 # Autenticação Azure local (DefaultAzureCredential usa o az login)
@@ -55,15 +57,17 @@ az cosmosdb sql database create -a cosmos-radar -g $RG -n radar
 az cosmosdb sql container create -a cosmos-radar -g $RG -d radar \
   -n reports --partition-key-path /theme_slug
 
-# Grounding with Bing Search (mesmo RG do projeto Foundry) + conexão no projeto
-# (portal: Foundry > Connections > Grounding with Bing Search)
+# Modelo já provisionado no projeto Foundry existente (omc-cli/omc-ccg-cli):
+# deployment "gpt-5-radar" (gpt-5.4-mini, GA). Web Search tool é nativo da nova
+# agents API — nenhum recurso/conexão externa a criar (R1).
 
 # App Service Linux B1 + deploy (Always On evita cold start na demo)
 az webapp up -n app-radar-tendencias -g $RG --runtime PYTHON:3.11 --sku B1
 az webapp config set -n app-radar-tendencias -g $RG --always-on true \
   --startup-file "python -m streamlit run app/Home.py --server.port 8000 --server.address 0.0.0.0 --server.headless true"
 az webapp config appsettings set -n app-radar-tendencias -g $RG --settings \
-  PROJECT_ENDPOINT=... MODEL_DEPLOYMENT_NAME=gpt-4.1 BING_CONNECTION_ID=... \
+  PROJECT_ENDPOINT=https://omc-cli.services.ai.azure.com/api/projects/omc-ccg-cli \
+  MODEL_DEPLOYMENT_NAME=gpt-5-radar \
   COSMOS_ENDPOINT=... COSMOS_KEY=... MAX_ANALYSES_PER_DAY=10 \
   SCM_DO_BUILD_DURING_DEPLOYMENT=true
 

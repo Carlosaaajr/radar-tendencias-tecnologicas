@@ -3,7 +3,23 @@
 > Documento vivo exigido pelo Princípio VI da constituição. Atualizado a cada fase.
 > Base da seção de avaliação crítica da apresentação à banca.
 >
-> Última atualização: 2026-07-04 (fase: plan — pós-revisão octo-cloud-architect)
+> Última atualização: 2026-07-04 (provisionamento real — pivot Web Search tool, ver R1)
+
+## Achado real de provisionamento (2026-07-04)
+
+Ao provisionar o projeto Foundry (`omc-cli/omc-ccg-cli`, brazilsouth) para o spike do
+dia 1, dois bloqueios reais invalidaram a suposição original de usar GPT-4.1 + Bing
+Grounding "classic":
+
+1. **GPT-4.1 e toda a família GPT-4o estão `Deprecating`** para novo deployment nesta
+   conta (só GPT-5.x é `GenerallyAvailable`).
+2. **O recurso Bing Grounding (SKU G1) não é elegível** nesta assinatura (restrição
+   típica de contas PAYG individuais, que exigem Enterprise Agreement/CSP).
+
+Decisão: pivotar para o **Web Search tool** nativo da nova agents API (GA, sem recurso
+externo) com deployment dedicado `gpt-5-radar` (gpt-5.4-mini). Isso **elimina o custo de
+transação do Bing** das estimativas abaixo e remove uma dependência de provisionamento —
+achado positivo em meio ao replanejamento. Detalhes em research.md R1.
 
 ## Custos estimados
 
@@ -16,22 +32,25 @@ campo `metrics` dos relatórios antes da apresentação.
 |---|---|
 | App Service B1 Linux | ~US$13,14/mês |
 | Cosmos DB serverless | < US$1/mês neste volume (~US$0,25/1M RU + ~US$0,25/GB-mês) |
-| Foundry Agent Service / Bing grounding | sem custo fixo (por token e por transação) |
+| Foundry Agent Service / Web Search tool | sem custo fixo (por token e por chamada de ferramenta) |
 | **Total fixo** | **~US$14-15/mês** |
 
 ### Por análise
 
 | Item | Cálculo | Estimativa |
 |---|---|---|
-| GPT-4.1 Agente Coletor | 30-60k tokens in (resultados de busca no contexto) + 4-8k out (US$2/M in, US$8/M out) | US$0,09-0,18 |
-| GPT-4.1 Agente Sintetizador | 10-20k in (corpus) + 3-5k out | US$0,05-0,08 |
-| Grounding with Bing Search | US$35/1.000 transações; 4-8 tool calls/análise | US$0,14-0,28 |
+| gpt-5-radar (Agente Coletor) | 30-60k tokens in (resultados de busca no contexto) + 4-8k out — preço a confirmar no smoke test (T036), ordem de grandeza próxima do GPT-4.1 | US$0,09-0,18 (verificar) |
+| gpt-5-radar (Agente Sintetizador) | 10-20k in (corpus) + 3-5k out | US$0,05-0,08 (verificar) |
+| Web Search tool | cobrança por chamada de ferramenta — preço a confirmar no smoke test (sem tarifário de "transação Bing" separado neste caminho) | verificar |
 | Cosmos (escrita ~15-30 RU) | — | < US$0,01 |
-| **Total por análise** | | **~US$0,30-0,60** |
+| **Total por análise** | | **a confirmar em T036 — ordem de grandeza US$0,20-0,50** |
 
-Cenário 100 análises/mês: **~US$45-75/mês total**. Alavanca de custo dominante: número
-de perguntas multi-perspectiva (cada uma = tool call do Bing + contexto no Coletor) —
-por isso fixado em 4 no MVP (R2).
+Cenário 100 análises/mês: estimativa preliminar **~US$30-60/mês total** (a confirmar).
+Alavanca de custo dominante: número de perguntas multi-perspectiva (cada uma = chamada
+de ferramenta + contexto no Coletor) — por isso fixado em 4 no MVP (R2). **Ação
+obrigatória**: substituir esta tabela por números medidos no smoke test de produção
+(T036), já que o tarifário de `gpt-5.4-mini` + Web Search tool não estava confirmado
+nesta fase de planejamento.
 
 **Freios de abuso** (app público sem auth — R10): Access Restrictions por IP, limite
 `MAX_ANALYSES_PER_DAY=10`, budget alert de US$30/mês, TPM baixo no deployment.
@@ -43,29 +62,34 @@ por isso fixado em 4 no MVP (R2).
   preprints de CS/física (mitigado por OpenAlex, cobertura multidisciplinar).
 - **De idioma**: corpus predominantemente em inglês; sinais de mercado brasileiro
   sub-representados (busca cobre pt+en, mas o volume publicado difere).
-- **De modelo**: o Sintetizador (GPT-4.1) pode privilegiar narrativas dominantes no
+- **De modelo**: o Sintetizador (`gpt-5-radar`) pode privilegiar narrativas dominantes no
   treinamento. Mitigação estrutural: só afirma com citação; graduação de suporte é
   código determinístico, não autoavaliação do LLM (R8); divergências explicitadas.
-- **De recorte do buscador**: o ranking do Bing decide o que o Coletor vê — mitigado
-  parcialmente pelas 4 perspectivas STORM e pelas fontes acadêmicas determinísticas.
+- **De recorte do buscador**: o ranking do provedor de busca por trás do Web Search
+  tool decide o que o Coletor vê — mitigado parcialmente pelas 4 perspectivas STORM e
+  pelas fontes acadêmicas determinísticas.
 
 ## Limitações conhecidas (fase de plano)
 
-1. Plataforma de agentes "classic" do Foundry deprecated (retirada 31/03/2027) — spike
-   dia 1 valida; migração para nova agents API é evolução declarada (R1).
+1. GPT-4.1/GPT-4o não são mais implantáveis nesta conta (deprecating) e o recurso Bing
+   Grounding "classic" não é elegível nesta assinatura — pipeline usa Web Search tool +
+   `gpt-5-radar` (R1); tarifário ainda não confirmado (ver smoke test T036).
 2. Sem acesso a texto completo pago (paywalls) — evidências baseadas em
    abstracts/sumários/cobertura pública.
 3. Patentes só por sinais via busca web — sem API dedicada no MVP.
 4. Usuário único, sem auth — controle de acesso por IP allowlist apenas.
-5. SC-001 (≤5 min) apertado contra latência do agente com 4 buscas groundadas — medir
-   no spike; plano B: 2 runs paralelos (achado 7 da revisão).
+5. SC-001 (≤5 min) apertado contra latência do agente com 4 buscas web — medir no
+   spike; plano B: 2 runs paralelos (achado 7 da revisão de arquitetura).
 6. Análise síncrona in-process no Streamlit — execução não sobrevive a restart do App
    Service (mitigado por doc `running` persistido + retomada manual).
+7. Deployment `gpt-5-radar` tem capacidade reservada baixa (10 TPM-equivalente) para
+   isolar do restante da conta `omc-cli` (compartilhada com outras ferramentas) —
+   suficiente para demo, pode gargalar sob uso concorrente real.
 
 ## Evoluções futuras priorizadas
 
-1. Migração para a nova agents API do Foundry / Web Search tool (elimina recurso Bing
-   separado).
+1. Reavaliar migração de assinatura (Enterprise Agreement/CSP) caso o Bing Grounding
+   "classic" com citações mais ricas seja desejado no futuro.
 2. API dedicada de patentes (EPO OPS — cobertura mundial incl. BR, conta gratuita).
 3. Easy Auth/Entra ID + multiusuário; Key Vault + RBAC data plane no Cosmos
    (`disableLocalAuth`).

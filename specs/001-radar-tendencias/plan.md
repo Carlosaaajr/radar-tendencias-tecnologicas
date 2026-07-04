@@ -19,8 +19,8 @@ no Cosmos DB serverless; histórico abre sem nova coleta. Detalhes e justificati
 
 **Language/Version**: Python 3.11+ (runtime nativo do App Service Linux)
 
-**Primary Dependencies**: `streamlit` (UI), `azure-ai-projects` + `azure-ai-agents`
-(Foundry Agent Service, BingGroundingTool), `azure-identity` (DefaultAzureCredential),
+**Primary Dependencies**: `streamlit` (UI), `azure-ai-projects` (Foundry Agent Service,
+nova agents API, Web Search tool nativo), `azure-identity` (DefaultAzureCredential),
 `azure-cosmos` (persistência), `httpx` (arXiv/OpenAlex), `pydantic` (schemas do painel e
 evidências), `python-dotenv` (config local), `feedparser` (Atom do arXiv)
 
@@ -33,8 +33,10 @@ evidências + graus de suporte)
 
 **Target Platform**: Azure App Service Linux (plano B1), startup command
 `python -m streamlit run app/Home.py --server.port 8000 --server.address 0.0.0.0`;
-agentes no projeto Azure AI Foundry existente (modelo GPT-4.1 — Bing grounding é
-incompatível com gpt-4o-mini/gpt-5)
+agentes no projeto Foundry `omc-cli/omc-ccg-cli` (brazilsouth) já existente, deployment
+dedicado `gpt-5-radar` (gpt-5.4-mini, GA) — ver R1 para o porquê de GPT-4.1 ter sido
+descartado (deprecating para novo deployment) e do Bing Grounding "classic" ter sido
+descartado (SKU G1 inelegível nesta assinatura)
 
 **Project Type**: Web application single-project (UI + pipeline no mesmo deploy;
 Streamlit chama o orquestrador in-process — sem API separada no MVP)
@@ -73,6 +75,14 @@ AJUSTES** — 6 ajustes obrigatórios aplicados (Managed Identity/RBAC, controle
 deprecação da plataforma classic + spike dia 1, modo offline local, regra de graduação
 totalizada, operação Streamlit/App Service). Estimativa FinOps registrada em
 `docs/critical-review.md`: ~US$14-15/mês fixo + ~US$0,30-0,60 por análise.
+
+**Provisionamento real (2026-07-04)**: o spike do dia 1 (T006) foi antecipado durante o
+planejamento e revelou 2 bloqueios reais que o gate deveria capturar — GPT-4.1/4o
+`Deprecating` para novo deployment, e recurso Bing Grounding (SKU G1) inelegível nesta
+assinatura. Pivotado para **Web Search tool** (nativo, GA, sem recurso separado) +
+deployment dedicado `gpt-5-radar`. Ver R1 em research.md para o achado completo; R1/R2
+e os contratos de agente foram atualizados de acordo. T006 permanece no tasks.md como
+validação funcional (citações + latência), não mais como decisão de caminho.
 
 ## Project Structure
 
@@ -132,7 +142,7 @@ docs/
 └── critical-review.md       # Custos, vieses, limitações, evoluções (Princípio VI)
 
 infra/
-└── provision.md             # Passos az cli p/ App Service, Cosmos, Bing grounding
+└── provision.md             # Passos az cli p/ App Service, Cosmos, deployment do modelo
 ```
 
 **Structure Decision**: single-project Python. Streamlit (`app/`) importa o pacote
