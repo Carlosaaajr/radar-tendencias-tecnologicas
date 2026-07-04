@@ -1,0 +1,35 @@
+{
+  "_comment": "Formato normalizado que collector_agent.py produz após extrair citações de URL da resposta do Web Search tool (Foundry agents API). Usado como fixture para os testes de collector_agent — não é o payload bruto do SDK.",
+  "technical": [
+    {
+      "url": "https://www.mckinsey.com/edge-ai-industrial-adoption",
+      "title": "Edge AI adoption accelerates in industrial settings",
+      "snippet": "Manufacturers are increasingly deploying edge AI to reduce latency in quality control and predictive maintenance workflows.",
+      "language": "en"
+    }
+  ],
+  "economic": [
+    {
+      "url": "https://www.gartner.com/en/newsroom/press-releases/edge-ai-market-2026",
+      "title": "Gartner Forecasts Edge AI Market to Reach $X Billion by 2028",
+      "snippet": "Investment in edge AI infrastructure is expected to grow substantially as enterprises seek to reduce cloud dependency.",
+      "language": "en"
+    }
+  ],
+  "industrial": [
+    {
+      "url": "https://www.weforum.org/agenda/2026/edge-ai-manufacturing",
+      "title": "How edge AI is reshaping the factory floor",
+      "snippet": "Case studies from automotive and electronics manufacturers show adoption signals across quality inspection and robotics.",
+      "language": "en"
+    }
+  ],
+  "regulatory": [
+    {
+      "url": "https://ec.europa.eu/digital-strategy/edge-ai-guidelines",
+      "title": "EU guidelines on AI deployed at the edge",
+      "snippet": "Regulatory bodies are drafting guidance on data governance for AI systems operating outside centralized cloud environments.",
+      "language": "en"
+    }
+  ]
+}

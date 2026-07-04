@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title>ArXiv Query: search_query=all:edge+AI</title>
+  <id>http://arxiv.org/api/query</id>
+  <updated>2026-07-01T00:00:00Z</updated>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/2601.00001v1</id>
+    <updated>2026-01-05T12:00:00Z</updated>
+    <published>2026-01-05T12:00:00Z</published>
+    <title>Edge AI Inference Optimization for Industrial IoT Devices</title>
+    <summary>We propose a lightweight quantization scheme for running deep neural
+networks on resource-constrained edge devices in industrial settings, reducing
+latency by 40% without significant accuracy loss.</summary>
+    <author><name>Ana Silva</name></author>
+    <author><name>John Doe</name></author>
+    <link href="http://arxiv.org/abs/2601.00001v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2601.00001v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.00042v2</id>
+    <updated>2026-02-10T09:30:00Z</updated>
+    <published>2026-02-08T09:30:00Z</published>
+    <title>Federated Learning at the Edge: A Survey for Manufacturing Applications</title>
+    <summary>This survey reviews federated learning techniques applied to edge
+computing scenarios in manufacturing, covering communication efficiency,
+privacy guarantees and real-world deployment case studies.</summary>
+    <author><name>Maria Costa</name></author>
+    <link href="http://arxiv.org/abs/2602.00042v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2602.00042v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

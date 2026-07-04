@@ -21,6 +21,24 @@ externo) com deployment dedicado `gpt-5-radar` (gpt-5.4-mini). Isso **elimina o 
 transação do Bing** das estimativas abaixo e remove uma dependência de provisionamento —
 achado positivo em meio ao replanejamento. Detalhes em research.md R1.
 
+## Spike T006 — validado (2026-07-04)
+
+Rodado contra o projeto real (`omc-cli/omc-ccg-cli`) via
+`AIProjectClient.get_openai_client()` + `responses.create(model="gpt-5-radar",
+tools=[{"type": "web_search"}])`:
+
+- **Latência**: 30,3s para 1 pergunta com busca web (`item.type=web_search_call` +
+  `message`). Para as 4 perguntas do R2, rodar concorrente (`asyncio.gather`) é
+  obrigatório para caber em SC-001 (≤5 min) — sequencial ultrapassaria 2 min só na coleta
+  de mercado.
+- **Citações**: 13 `url_citation` retornadas para 1 pergunta (com duplicatas — a
+  deduplicação do FR-007 absorve isso), incluindo fontes reais como NVIDIA, Siemens,
+  Intel, Accenture e Deloitte — cobre exatamente os tipos de fonte que o desafio pede.
+- **Formato da anotação**: `{type, url, title, start_index, end_index}` — os índices
+  permitem extrair o snippet como a janela de texto ao redor da citação no
+  `output_text`/`content` da mensagem (usado em `collector_agent.py`, T023).
+- Resultado bruto salvo em `infra/spike_result.json`.
+
 ## Custos estimados
 
 Preços verificados em jul/2026, sujeitos a região — substituir por números medidos via

@@ -1,0 +1,47 @@
+{
+  "meta": { "count": 2, "db_response_time_ms": 12, "page": 1, "per_page": 10 },
+  "results": [
+    {
+      "id": "https://openalex.org/W4400000001",
+      "doi": "https://doi.org/10.1000/edge-ai-2026",
+      "title": "Edge AI Deployment Patterns in Industrial Automation",
+      "publication_date": "2026-03-12",
+      "language": "en",
+      "cited_by_count": 15,
+      "primary_location": {
+        "source": { "display_name": "IEEE Transactions on Industrial Informatics" },
+        "landing_page_url": "https://doi.org/10.1000/edge-ai-2026"
+      },
+      "abstract_inverted_index": {
+        "Edge": [0],
+        "AI": [1],
+        "enables": [2],
+        "real-time": [3],
+        "decision-making": [4],
+        "on": [5],
+        "factory": [6],
+        "floors.": [7]
+      }
+    },
+    {
+      "id": "https://openalex.org/W4400000002",
+      "doi": null,
+      "title": "A Review of Edge Computing Architectures for Smart Manufacturing",
+      "publication_date": "2025-11-20",
+      "language": "en",
+      "cited_by_count": 42,
+      "primary_location": {
+        "source": { "display_name": "Nature Machine Intelligence" },
+        "landing_page_url": "https://openalex.org/W4400000002"
+      },
+      "abstract_inverted_index": {
+        "This": [0],
+        "review": [1],
+        "covers": [2],
+        "edge": [3],
+        "computing": [4],
+        "architectures.": [5]
+      }
+    }
+  ]
+}

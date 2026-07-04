@@ -1,0 +1,25 @@
+{
+  "date": "2026-07-04",
+  "project": "omc-cli/omc-ccg-cli",
+  "model_deployment": "gpt-5-radar",
+  "elapsed_seconds": 30.28,
+  "citations_count": 13,
+  "citations_sample": [
+    {
+      "type": "url_citation",
+      "url": "https://www.nvidia.com/en-in/industries/industrial/",
+      "title": "AI solutions for industrial applications | NVIDIA"
+    },
+    {
+      "type": "url_citation",
+      "url": "https://www.nvidia.com/en-in/industries/industrial/",
+      "title": "AI solutions for industrial applications | NVIDIA"
+    },
+    {
+      "type": "url_citation",
+      "url": "https://www.nvidia.com/en-in/industries/industrial/",
+      "title": "AI solutions for industrial applications | NVIDIA"
+    }
+  ],
+  "output_text_preview": "In 2026, the main **industrial applications of Edge AI** are concentrated in a few high-value areas:\n\n1. **Quality inspection and defect detection**  \n   Edge AI is widely used on production lines for real-time visual inspection, spotting product defects, and reducing scrap/rework. Manufacturers and"
+}

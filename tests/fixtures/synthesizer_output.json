@@ -1,0 +1,66 @@
+{
+  "valid": {
+    "scope_note": null,
+    "sections": [
+      {
+        "key": "definition",
+        "content_md": "Edge AI refere-se à execução de modelos de inteligência artificial diretamente em dispositivos próximos à fonte dos dados, reduzindo a dependência de conectividade com a nuvem [ev-1][ev-3].",
+        "evidence_ids": ["ev-1", "ev-3"],
+        "is_inference": false,
+        "divergence_note": null
+      },
+      {
+        "key": "maturity",
+        "content_md": "A tecnologia está em fase de adoção inicial em manufatura, com casos de uso consolidados em inspeção de qualidade [ev-2][ev-4].",
+        "evidence_ids": ["ev-2", "ev-4"],
+        "is_inference": false,
+        "divergence_note": null
+      },
+      {
+        "key": "risks",
+        "content_md": "Fontes divergem sobre o ritmo de regulamentação: a União Europeia sinaliza diretrizes restritivas [ev-5], enquanto associações industriais defendem autorregulação [ev-1].",
+        "evidence_ids": ["ev-5", "ev-1"],
+        "is_inference": false,
+        "divergence_note": "UE propõe diretrizes restritivas enquanto o setor privado defende autorregulação."
+      },
+      {
+        "key": "outlook",
+        "content_md": "Esperamos consolidação do mercado nos próximos 3 anos.",
+        "evidence_ids": [],
+        "is_inference": true,
+        "divergence_note": null
+      }
+    ]
+  },
+  "invalid_missing_required_field": {
+    "sections": [
+      {
+        "key": "definition",
+        "evidence_ids": ["ev-1"],
+        "is_inference": false
+      }
+    ]
+  },
+  "invalid_orphan_evidence_id": {
+    "sections": [
+      {
+        "key": "definition",
+        "content_md": "Texto citando evidência inexistente [ev-999].",
+        "evidence_ids": ["ev-999"],
+        "is_inference": false,
+        "divergence_note": null
+      }
+    ]
+  },
+  "invalid_bad_enum_key": {
+    "sections": [
+      {
+        "key": "not_a_real_section",
+        "content_md": "Texto qualquer.",
+        "evidence_ids": ["ev-1"],
+        "is_inference": false,
+        "divergence_note": null
+      }
+    ]
+  }
+}

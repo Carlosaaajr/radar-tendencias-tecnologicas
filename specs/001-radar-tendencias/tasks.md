@@ -33,14 +33,14 @@ US3 exploração de evidências), com Setup e Foundational antes.
 
 **⚠️ CRITICAL**: Nenhuma user story começa antes desta fase terminar
 
-- [ ] T006 **SPIKE DIA 1 (gate de risco — R1, caminho já decidido)**: script `infra/spike_web_search.py` que cria agente com Web Search tool no projeto Foundry `omc-cli/omc-ccg-cli` usando o deployment `gpt-5-radar`, roda 1 pergunta, valida formato das citações de URL e mede latência; registrar resultado em `docs/critical-review.md`. **Se falhar: parar e revisitar R1** (não há mais fallback de plataforma — Bing Grounding classic está descartado por bloqueio de assinatura, ver research.md R1)
-- [ ] T007 [P] Implement Pydantic models in `src/radar/models.py`: Evidence (snippet ≤500 chars, URL obrigatória), PanelSection, SupportGrade, Report, ReportSummary, enums SourceType/SectionKey/ReportStatus/SupportLevel — conforme data-model.md e report-schema.json
-- [ ] T008 [P] Implement settings in `src/radar/config.py` (pydantic-settings): PROJECT_ENDPOINT, MODEL_DEPLOYMENT_NAME (default gpt-5-radar), COSMOS_ENDPOINT/KEY, ANALYSIS_BUDGET_SECONDS=360, MAX_ANALYSES_PER_DAY=10, RADAR_OFFLINE flag
-- [ ] T009 [P] Define `ReportRepository` protocol in `src/radar/storage/base.py` (save, get(id, theme_slug) point read, list_summaries, find_by_slug) per contracts §7
-- [ ] T010 Implement `LocalReportRepository` in `src/radar/storage/local.py` (JSON files em `data/reports/` — R9; usado também pelos testes) + unit test `tests/unit/test_local_repo.py`
-- [ ] T011 Implement `CosmosReportRepository` in `src/radar/storage/cosmos.py` (point read, projeção leve no list_summaries, retry 1x na escrita) + factory por RADAR_OFFLINE em `src/radar/storage/__init__.py`
-- [ ] T012 [P] Define `Collector` protocol + `CollectorResult` in `src/radar/collectors/base.py` (nunca propaga exceção, degraded/error, timeout por fonte — contracts §1)
-- [ ] T013 [P] Create test fixtures in `tests/fixtures/`: arxiv_atom.xml, openalex_response.json, agent_citations.json, synthesizer_output.json (válido e inválido)
+- [X] T006 **SPIKE DIA 1 — VALIDADO**: `infra/spike_web_search.py` confirmou Web Search tool + `gpt-5-radar` na nova agents API (`AIProjectClient.get_openai_client().responses.create`); 30,3s/pergunta, 13 citações reais (NVIDIA/Siemens/Intel/Accenture/Deloitte), anotação `{url,title,start_index,end_index}`. Resultado em `infra/spike_result.json`, achado registrado em `docs/critical-review.md`. Confirma: 4 perguntas do R2 DEVEM rodar concorrentes (asyncio.gather) para caber em SC-001
+- [X] T007 [P] Implement Pydantic models in `src/radar/models.py`: Evidence (snippet ≤500 chars, URL obrigatória), PanelSection, SupportGrade, Report, ReportSummary, enums SourceType/SectionKey/ReportStatus/SupportLevel — conforme data-model.md e report-schema.json
+- [X] T008 [P] Implement settings in `src/radar/config.py` (pydantic-settings): PROJECT_ENDPOINT, MODEL_DEPLOYMENT_NAME (default gpt-5-radar), COSMOS_ENDPOINT/KEY, ANALYSIS_BUDGET_SECONDS=360, MAX_ANALYSES_PER_DAY=10, RADAR_OFFLINE flag
+- [X] T009 [P] Define `ReportRepository` protocol in `src/radar/storage/base.py` (save, get(id, theme_slug) point read, list_summaries, find_by_slug) per contracts §7
+- [X] T010 Implement `LocalReportRepository` in `src/radar/storage/local.py` (JSON files em `data/reports/` — R9; usado também pelos testes) + unit test `tests/unit/test_local_repo.py` (5/5 passando)
+- [X] T011 Implement `CosmosReportRepository` in `src/radar/storage/cosmos.py` (point read, projeção leve no list_summaries, retry 1x na escrita) + factory por RADAR_OFFLINE em `src/radar/storage/__init__.py`
+- [X] T012 [P] Define `Collector` protocol + `CollectorResult` in `src/radar/collectors/base.py` (nunca propaga exceção, degraded/error, timeout por fonte — contracts §1)
+- [X] T013 [P] Create test fixtures in `tests/fixtures/`: arxiv_atom.xml, openalex_response.json, agent_citations.json, synthesizer_output.json (válido e inválido)
 
 **Checkpoint**: spike validado + modelos/storage/protocolos prontos — stories podem começar
 

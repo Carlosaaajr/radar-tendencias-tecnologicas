@@ -56,11 +56,11 @@ Decision / Rationale / Alternatives.
 
 - **Decision**: O orquestrador instrui o Agente Coletor a gerar **4 perguntas** sobre o
   tema (uma por perspectiva fixa: técnica, econômica/mercado, industrial/adoção,
-  regulatória/riscos) e responder cada uma com busca groundada; cada resposta traz
-  citações. As perguntas e respostas viram evidências tipadas. Fixado em 4 no MVP para
-  conter latência (SC-001) e custo por análise (Web Search tool cobra por chamada de
-  ferramenta, mesma ordem de grandeza de tokens extras no contexto);
-  se o spike do dia 1 medir folga, avaliar 2 runs paralelos de 2-3 perguntas.
+  regulatória/riscos) e responder cada uma com busca web nativa; cada resposta traz
+  citações (via `responses.create(tools=[{"type": "web_search"}])`). As 4 chamadas
+  **MUST rodar concorrentes** (`asyncio.gather`), nunca sequenciais — o spike T006 mediu
+  30,3s para 1 pergunta; sequencial ultrapassaria 2 min só nesta etapa, inviabilizando
+  SC-001 (≤5 min). As perguntas e respostas viram evidências tipadas.
 - **Rationale**: Reproduz o núcleo do STORM (perspective-guided question asking) sem
   importar o framework (dspy/litellm), que conflitaria com o Agent Service e o prazo
   (Princípio II). Diversifica evidências e é argumento metodológico forte para a banca.
