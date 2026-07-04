@@ -43,12 +43,37 @@ pytest              # unit + integration, tudo mockado — sem custo, sem creden
 pytest -m live       # smoke test contra Azure real (exige .env válido; consome tokens/RU)
 ```
 
+40 testes automatizados cobrem os módulos críticos do pipeline (Princípio V): dedup,
+grau de suporte, parsing/validação da saída do Sintetizador, coletores acadêmicos e o
+orquestrador completo (fluxo feliz, degradação parcial e total, timeout).
+
+## Estrutura do projeto
+
+```text
+app/            Streamlit — UI (Home, Histórico, Evidências)
+src/radar/      Pacote instalável (pipeline, agentes, coletores, storage)
+tests/          Unit + integração (mockados) e fixtures
+infra/          Scripts e documentação de provisionamento Azure
+docs/           Arquitetura e avaliação crítica
+specs/          Constituição, spec, plano, research e tasks (spec-kit)
+```
+
 ## Como fazer deploy
 
-Provisionamento completo (Cosmos, App Service, Managed Identity, freios de custo) em
-[`infra/provision.md`](infra/provision.md).
+Provisionamento completo (Cosmos DB, App Service, Managed Identity, freios de custo) em
+[`infra/provision.md`](infra/provision.md). Ambiente de referência já implantado:
+resource group `radar-trends`, região `brazilsouth` (mesma do projeto Azure AI Foundry,
+para evitar latência cross-region).
 
 ## Avaliação crítica
 
 Custos estimados, vieses conhecidos, limitações e evoluções futuras em
-[`docs/critical-review.md`](docs/critical-review.md).
+[`docs/critical-review.md`](docs/critical-review.md) — inclui o relato honesto do
+atrito real de provisionamento (mudanças de região, bloqueios de plataforma) enfrentado
+durante o desenvolvimento.
+
+## Contexto do desafio
+
+Este projeto foi desenvolvido para o desafio **SENAI do Futuro — IA** (Radar de
+Tendências Tecnológicas). A especificação completa do problema de negócio está em
+[`specs/001-radar-tendencias/spec.md`](specs/001-radar-tendencias/spec.md).

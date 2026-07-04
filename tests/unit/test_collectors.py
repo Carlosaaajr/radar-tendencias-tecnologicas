@@ -91,6 +91,26 @@ async def test_evidence_without_url_is_discarded():
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_openalex_null_source_does_not_crash_collection():
+    """Regressao: work com primary_location.source=null (comum em preprints) nao
+    pode derrubar a coleta inteira (achado H1 da revisao de codigo)."""
+    import json
+
+    fixture = json.loads((FIXTURES / "openalex_response.json").read_text(encoding="utf-8"))
+    fixture["results"][0]["primary_location"]["source"] = None
+    respx.get(OPENALEX_API_URL).mock(return_value=httpx.Response(200, json=fixture))
+
+    collector = OpenAlexCollector()
+    result = await collector.collect("Edge AI", limit=10, timeout_s=5)
+
+    assert result.degraded is False
+    assert len(result.evidence) == 2
+    first = next(e for e in result.evidence if e.id == "ev-1")
+    assert first.origin == "OpenAlex"
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_snippet_truncated_to_500_chars():
     body = (FIXTURES / "arxiv_atom.xml").read_text(encoding="utf-8")
     long_summary = "x" * 1000

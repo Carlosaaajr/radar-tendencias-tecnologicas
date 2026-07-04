@@ -91,6 +91,11 @@ Decision / Rationale / Alternatives.
   `status=running` é persistido no início do pipeline e atualizado ao fim — rerun ou
   queda de WebSocket não perde a execução; `st.session_state` guarda flag para não
   reiniciar o pipeline em rerun acidental.
+  **Achado do deploy real (2026-07-04)**: `az webapp create` cria o App Service com
+  `webSocketsEnabled=false` por padrão — **obrigatório** habilitar explicitamente
+  (`az webapp config set --web-sockets-enabled true`), pois o Streamlit depende de
+  WebSocket para as atualizações de UI; sem isso, o app carrega mas trava sem
+  atualizar. Adicionado a `infra/provision.md`.
 - **Rationale**: Decisão do usuário (Python full + App Service). Startup command é o
   padrão documentado para Streamlit no App Service Linux
   ([guia azureossd](https://azureossd.github.io/2024/04/18/Deploying-a-Python-Streamlit-app-to-App-Service-Linux/),

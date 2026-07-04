@@ -38,31 +38,35 @@ class OpenAlexCollector:
                 response = await client.get(OPENALEX_API_URL, params=params)
                 response.raise_for_status()
                 data = response.json()
+
+            evidence: list[Evidence] = []
+            for work in data.get("results", []):
+                primary = work.get("primary_location") or {}
+                url = primary.get("landing_page_url") or work.get("doi")
+                if not url:
+                    continue
+                title = (work.get("title") or "").strip()
+                if not title:
+                    continue
+                source = primary.get("source") or {}
+                origin = source.get("display_name") or "OpenAlex"
+                snippet = _reconstruct_abstract(work.get("abstract_inverted_index"))
+                evidence.append(
+                    Evidence(
+                        id=f"ev-{len(evidence) + 1}",
+                        title=title,
+                        source_type=SourceType.SCIENTIFIC,
+                        origin=origin,
+                        url=url,
+                        published_at=work.get("publication_date"),
+                        snippet=snippet[:SNIPPET_MAX_LENGTH],
+                        language=work.get("language") or "en",
+                        citation_count=work.get("cited_by_count"),
+                    )
+                )
         except (httpx.TimeoutException, httpx.HTTPError, ValueError) as exc:
             return CollectorResult(evidence=[], degraded=True, error=str(exc))
+        except Exception as exc:  # noqa: BLE001 — registro malformado nunca derruba a coleta (FR-012)
+            return CollectorResult(evidence=[], degraded=True, error=str(exc))
 
-        evidence: list[Evidence] = []
-        for work in data.get("results", []):
-            url = (work.get("primary_location") or {}).get("landing_page_url") or work.get("doi")
-            if not url:
-                continue
-            title = (work.get("title") or "").strip()
-            if not title:
-                continue
-            snippet = _reconstruct_abstract(work.get("abstract_inverted_index"))
-            evidence.append(
-                Evidence(
-                    id=f"ev-{len(evidence) + 1}",
-                    title=title,
-                    source_type=SourceType.SCIENTIFIC,
-                    origin=(work.get("primary_location") or {}).get("source", {}).get(
-                        "display_name", "OpenAlex"
-                    ),
-                    url=url,
-                    published_at=work.get("publication_date"),
-                    snippet=snippet[:SNIPPET_MAX_LENGTH],
-                    language=work.get("language") or "en",
-                    citation_count=work.get("cited_by_count"),
-                )
-            )
         return CollectorResult(evidence=evidence, degraded=False, error=None)

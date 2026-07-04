@@ -111,6 +111,28 @@ async def test_one_source_degraded_still_completes():
 
 
 @pytest.mark.asyncio
+async def test_raw_exception_in_one_academic_collector_still_completes():
+    """Regressao: excecao crua (nao CollectorResult.degraded) em uma fonte academica
+    nao pode abortar a analise inteira (achado H2 da revisao de codigo)."""
+    academic_ok = CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC)])
+    market = CollectorResult(evidence=[_ev("ev-201", SourceType.MARKET)])
+
+    with (
+        patch("radar.orchestrator.ArxivCollector") as MockArxiv,
+        patch("radar.orchestrator.OpenAlexCollector") as MockOpenAlex,
+        patch("radar.orchestrator.run_market_collection", new=AsyncMock(return_value=market)),
+        _patch_synthesize(),
+    ):
+        MockArxiv.return_value.collect = AsyncMock(side_effect=AttributeError("boom"))
+        MockOpenAlex.return_value.collect = AsyncMock(return_value=academic_ok)
+
+        report = await run_analysis("Edge AI")
+
+    assert report.status == ReportStatus.COMPLETED
+    assert "arXiv" in report.degraded_sources
+
+
+@pytest.mark.asyncio
 async def test_market_fully_degraded_academic_ok_still_completes():
     academic = CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC), _ev("ev-102", SourceType.SCIENTIFIC)])
     market_degraded = CollectorResult(evidence=[], degraded=True, error="all perspectives failed")

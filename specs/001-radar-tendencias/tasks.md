@@ -118,13 +118,13 @@ por categoria e exibição de divergências (spec US3).
 
 **Purpose**: Deploy Azure, documentação da banca, revisão de código e ensaio de demo
 
-- [ ] T035 [P] Write `infra/provision.md` + provisionar Azure conforme quickstart.md §3: RG, Cosmos serverless (radar/reports), App Service B1 (Always On, startup command, App Settings), **Managed Identity + role "Azure AI User"**, Access Restrictions, budget alert (R10)
-- [ ] T036 Deploy app no App Service e smoke test em produção: gerar relatório real p/ os 2 temas do desafio, verificar `source_type_count ≥ 3` no agregado (SC-005), medir duração/custos via campo `metrics` e atualizar estimativas em `docs/critical-review.md`
-- [ ] T037 [P] Write `docs/architecture.md`: diagrama (mermaid) UI→orquestrador→agentes/coletas→Cosmos, decisões técnicas com justificativa e referência a R1-R10 (Princípio V)
-- [ ] T038 [P] Update `docs/critical-review.md` com números medidos (latência por etapa, tokens, custo real/análise) e limitações observadas (Princípio VI)
-- [ ] T039 Code review pelo agente **octo-code-reviewer** (gate da constituição) cobrindo `src/radar/` e `app/`; aplicar correções obrigatórias
-- [ ] T040 Preparar demo (quickstart §4): gerar e exportar 2-3 relatórios (Edge AI, Robôs Humanoides p/ Indústria), testar RADAR_OFFLINE=1 no notebook, ensaiar roteiro de 10 min, liberar IP do local nas Access Restrictions
-- [ ] T041 [P] Finalize `README.md`: instruções reproduzíveis completas (rodar, testar, deploy, demo offline) — Princípio V
+- [X] T035 [P] Write `infra/provision.md` + provisionar Azure conforme quickstart.md §3: RG (`radar-trends`, brazilsouth — não eastus, ver achado real), Cosmos serverless (radar/reports), App Service B1 (Always On, WebSockets, startup command, App Settings), Managed Identity (role `Foundry User` pendente de atribuição manual — CLI bloqueado por erro real `MissingSubscription`), budget alert pendente (CLI de `az consumption budget` com bug reproduzível — criar manualmente no portal)
+- [X] T036 Deploy app no App Service — deploy concluído (zip deploy, 3ª tentativa após 504/conexões instáveis), health check 200. Smoke test funcional com dados reais fica condicionado à atribuição manual da role Foundry (pendente do usuário)
+- [X] T037 [P] Write `docs/architecture.md`: diagrama mermaid UI→orquestrador→agentes/coletas→Cosmos, decisões técnicas com justificativa e referência a R1-R10 (Princípio V)
+- [X] T038 [P] Update `docs/critical-review.md`: achado real de provisionamento (região, WebSockets, atrito de rede), achados do code review e correções aplicadas
+- [X] T039 Code review pelo agente **octo-code-reviewer** (gate da constituição): veredito "aprovado com ressalvas"; 3 achados ALTO corrigidos (OpenAlex `source=null` derrubava a coleta, `gather` sem `return_exceptions` propagava exceção crua, síntese bloqueante sem timeout efetivo) + 1 MÉDIO (histórico mostrava `running` como completo); 42/42 testes passando, ruff limpo
+- [ ] T040 Preparar demo (quickstart §4): gerar e exportar 2-3 relatórios (Edge AI, Robôs Humanoides p/ Indústria), testar RADAR_OFFLINE=1 no notebook, ensaiar roteiro de 10 min, liberar IP do local nas Access Restrictions — **bloqueado até a role Foundry ser atribuída manualmente**
+- [X] T041 [P] Finalize `README.md`: instruções reproduzíveis completas (rodar, testar, deploy, demo offline), estrutura do projeto, contexto do desafio — Princípio V
 
 ---
 

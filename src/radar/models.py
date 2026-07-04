@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from uuid import uuid4
 
@@ -96,7 +96,7 @@ class Report(BaseModel):
     schema_version: int = 1
     theme: str = Field(min_length=2)
     theme_slug: str = Field(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     status: ReportStatus = ReportStatus.RUNNING
     scope_note: str | None = None
     sections: list[PanelSection] = Field(default_factory=list)

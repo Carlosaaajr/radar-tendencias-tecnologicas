@@ -40,6 +40,8 @@ else:
             cols[2].markdown("⚠️ Parcial")
         elif summary.status == ReportStatus.FAILED:
             cols[2].markdown("❌ Falhou")
+        elif summary.status == ReportStatus.RUNNING:
+            cols[2].markdown("⏳ Incompleto")
         else:
             cols[2].markdown("✅ Completo")
 

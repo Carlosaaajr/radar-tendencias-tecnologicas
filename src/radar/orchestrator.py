@@ -79,10 +79,15 @@ async def run_analysis(
     async def collect_academic() -> list:
         emit("academic", "Consultando arXiv e OpenAlex...")
         results = await asyncio.gather(
-            ArxivCollector().collect(theme), OpenAlexCollector().collect(theme)
+            ArxivCollector().collect(theme),
+            OpenAlexCollector().collect(theme),
+            return_exceptions=True,
         )
         evidence = []
         for name, result in zip(("arXiv", "OpenAlex"), results, strict=True):
+            if isinstance(result, BaseException):
+                degraded_sources.append(name)
+                continue
             if result.degraded:
                 degraded_sources.append(name)
             evidence.extend(result.evidence)

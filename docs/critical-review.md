@@ -39,6 +39,24 @@ tools=[{"type": "web_search"}])`:
   `output_text`/`content` da mensagem (usado em `collector_agent.py`, T023).
 - Resultado bruto salvo em `infra/spike_result.json`.
 
+## Deploy real — atrito de provisionamento (2026-07-04)
+
+Ao provisionar Cosmos DB + App Service, dois achados adicionais de infraestrutura real:
+
+1. **Região `eastus` sem capacidade para contas Cosmos DB novas** no momento do deploy
+   (`ServiceUnavailable`, mesmo com `isZoneRedundant=False`) — erro genuíno da Azure, não
+   do comando. Resolvido migrando Cosmos DB + App Service para **`brazilsouth`**, a mesma
+   região do projeto Foundry — elimina também a latência cross-region entre o App Service
+   e os agentes.
+2. **Conexões HTTPS de longa duração instáveis** durante `az cosmosdb create`/`az webapp
+   create` (connection reset em operações longas). Mitigado rodando os comandos em
+   background e verificando o estado via chamadas curtas (`az ... show`) em vez de manter
+   o poll síncrono do CLI.
+
+Aprendizado para a apresentação: capacidade regional de serviços gerenciados **não é
+garantida nem estável** — o plano de arquitetura deve sempre ter uma região alternativa
+pronta (aqui, colocalizar com o Foundry em `brazilsouth` resolveu dois problemas de uma vez).
+
 ## Custos estimados
 
 Preços verificados em jul/2026, sujeitos a região — substituir por números medidos via
@@ -103,6 +121,44 @@ nesta fase de planejamento.
 7. Deployment `gpt-5-radar` tem capacidade reservada baixa (10 TPM-equivalente) para
    isolar do restante da conta `omc-cli` (compartilhada com outras ferramentas) —
    suficiente para demo, pode gargalar sob uso concorrente real.
+
+## Code review (octo-code-reviewer, 2026-07-04) — achados e status
+
+Revisão obrigatória da constituição (T039) sobre todo o pipeline. Veredito: **aprovado
+com ressalvas**. 3 achados ALTO corrigidos antes da apresentação (bugs reais de
+resiliência que contradiziam o Princípio IV/FR-012):
+
+- **Corrigido**: `OpenAlexCollector` derrubava a coleta inteira quando um registro
+  vinha com `primary_location.source=null` (comum em preprints) — `AttributeError` não
+  capturado escapava do collector. Agora o parsing inteiro está sob try/except e trata
+  `source` ausente/nulo com segurança. Teste de regressão adicionado.
+- **Corrigido**: a coleta acadêmica (`asyncio.gather` de arXiv + OpenAlex) propagava
+  qualquer exceção crua em vez de degradar a fonte — combinado com o bug acima, uma
+  falha de parsing abortava a análise inteira em vez de completar com aviso. Agora usa
+  `return_exceptions=True` e trata exceção como fonte degradada. Teste de regressão
+  adicionado.
+- **Corrigido**: `synthesize()` chamava o cliente OpenAI de forma síncrona e bloqueante
+  dentro de uma função `async`, sem `asyncio.to_thread` nem `timeout` — o
+  `asyncio.wait_for` do orquestrador não conseguia de fato interromper uma chamada
+  pendurada, podendo congelar a demo inteira (processo single-thread). Corrigido para
+  rodar em thread com timeout efetivo.
+- **Corrigido**: relatórios com falha não tratada ficavam com `status=running` e
+  apareciam como "✅ Completo" no histórico. Adicionado estado visual explícito
+  "⏳ Incompleto".
+
+**Não corrigidos nesta fase** (severidade média/baixa, custo-benefício menor para o
+prazo — registrados como limitação/evolução):
+- Sem validação de que as 10 seções obrigatórias foram todas geradas pelo Sintetizador
+  (FR-004); seção ausente falha silenciosamente em vez de gerar aviso explícito.
+- `list_summaries` desserializa o relatório completo para montar o resumo do histórico
+  — aceitável no volume do MVP, mas não escala; persistir `support_overview`
+  pré-computado resolveria.
+- Cobertura de teste da função `synthesize()` (retry/parsing de streaming) é indireta,
+  via `parse_synthesis_output`; o caminho de timeout do LLM não tem teste dedicado.
+- Tema do usuário entra sem sanitização nos prompts (risco de prompt injection) —
+  mitigado estruturalmente pela graduação determinística em código (LLM não consegue
+  fabricar grau de suporte alto só por manipular o prompt), mas vale mencionar como
+  limitação conhecida na arguição.
 
 ## Evoluções futuras priorizadas
 

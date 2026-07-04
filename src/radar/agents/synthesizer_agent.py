@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from dataclasses import dataclass, field
 
@@ -103,10 +104,12 @@ async def synthesize(
                 f"\n\nATENÇÃO: a resposta anterior falhou na validação "
                 f"({last_error}). Responda apenas com o JSON válido descrito acima."
             )
-        response = client.responses.create(
+        response = await asyncio.to_thread(
+            client.responses.create,
             model=settings.model_deployment_name,
             input=instructions,
             text={"format": {"type": "json_object"}},
+            timeout=timeout_s,
         )
         try:
             raw = json.loads(response.output_text)
