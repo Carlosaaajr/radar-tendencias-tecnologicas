@@ -56,22 +56,22 @@ e referências clicáveis; simular falha de fonte e verificar conclusão com avi
 
 ### Tests for User Story 1 (módulos críticos — Princípio V; escrever ANTES da implementação)
 
-- [ ] T014 [P] [US1] Unit tests dedup in `tests/unit/test_dedup.py`: URL normalizada (tracking params, trailing slash, case), título similar ≥0.9, mantém metadados mais ricos (FR-007)
-- [ ] T015 [P] [US1] Unit tests grading in `tests/unit/test_grading.py`: regra TOTAL de R8 — high (≥4 E ≥2 tipos), medium (2-3 OU ≥4 com <2 tipos), low (1), inference (0), divergência
-- [ ] T016 [P] [US1] Unit tests collectors in `tests/unit/test_collectors.py` (respx): parsing arXiv/OpenAlex das fixtures, timeout → degraded=True sem exceção, evidência sem URL descartada, snippet truncado a 500
-- [ ] T017 [P] [US1] Unit tests synthesizer parsing in `tests/unit/test_synthesizer_parsing.py`: saída válida vs inválida contra report-schema.json, retry 1x, evidence_id órfão → is_inference=true + warning (contracts §3)
+- [X] T014 [P] [US1] Unit tests dedup in `tests/unit/test_dedup.py`: URL normalizada (tracking params, trailing slash, case), título similar ≥0.9, mantém metadados mais ricos (FR-007)
+- [X] T015 [P] [US1] Unit tests grading in `tests/unit/test_grading.py`: regra TOTAL de R8 — high (≥4 E ≥2 tipos), medium (2-3 OU ≥4 com <2 tipos), low (1), inference (0), divergência
+- [X] T016 [P] [US1] Unit tests collectors in `tests/unit/test_collectors.py` (respx): parsing arXiv/OpenAlex das fixtures, timeout → degraded=True sem exceção, evidência sem URL descartada, snippet truncado a 500
+- [X] T017 [P] [US1] Unit tests synthesizer parsing in `tests/unit/test_synthesizer_parsing.py`: saída válida vs inválida contra report-schema.json, retry 1x, evidence_id órfão → is_inference=true + warning (contracts §3)
 
 ### Implementation for User Story 1
 
-- [ ] T018 [P] [US1] Implement arXiv collector in `src/radar/collectors/arxiv.py` (Atom via httpx+feedparser, source_type=scientific)
-- [ ] T019 [P] [US1] Implement OpenAlex collector in `src/radar/collectors/openalex.py` (JSON, mailto param, citation_count, source_type=scientific)
-- [ ] T020 [P] [US1] Implement dedup in `src/radar/synthesis/dedup.py` (contracts §5)
-- [ ] T021 [P] [US1] Implement grading in `src/radar/synthesis/grading.py` (contracts §4, função pura)
-- [ ] T022 [US1] Implement Foundry agent lifecycle in `src/radar/agents/foundry.py`: criação idempotente (get-or-create por nome) do Coletor (Web Search tool) e Sintetizador, conforme validado no spike T006
-- [ ] T023 [US1] Implement CollectorAgent in `src/radar/agents/collector_agent.py`: 4 perguntas (1 por perspectiva R2), busca cobrindo pt e en (edge case de idioma), URL citations → Evidence (heurística de domínio p/ source_type), degradação graciosa (contracts §2)
-- [ ] T024 [US1] Implement SynthesizerAgent in `src/radar/agents/synthesizer_agent.py`: prompt pt-BR com corpus numerado, citação obrigatória por afirmação, divergence_note, validação por schema + retry (contracts §3)
-- [ ] T025 [US1] Implement orchestrator in `src/radar/orchestrator.py`: guarda MAX_ANALYSES_PER_DAY → doc `running` persistido → gather(acadêmico, mercado) → dedup → synthesize → grading → save final; budget com entrega parcial; corpus vazio → failed; corpus pequeno (< 5 evidências pós-dedup) → warning de baixa sustentação no Report (US1-cenário 4); ProgressEvent callbacks (contracts §6)
-- [ ] T026 [US1] Integration test pipeline in `tests/integration/test_pipeline.py` (agentes/HTTP mockados): fluxo feliz, uma fonte degradada → completed com degraded_sources, mercado inteiro degradado mas acadêmico ok → completed (corpus só acadêmico é válido — FR-012), todas degradadas → failed, timeout → partial (FR-013)
+- [X] T018 [P] [US1] Implement arXiv collector in `src/radar/collectors/arxiv.py` (Atom via httpx+feedparser, source_type=scientific)
+- [X] T019 [P] [US1] Implement OpenAlex collector in `src/radar/collectors/openalex.py` (JSON, mailto param, citation_count, source_type=scientific)
+- [X] T020 [P] [US1] Implement dedup in `src/radar/synthesis/dedup.py` (contracts §5)
+- [X] T021 [P] [US1] Implement grading in `src/radar/synthesis/grading.py` (contracts §4, função pura)
+- [X] T022 [US1] Implement Foundry client factory in `src/radar/agents/foundry.py`: `get_openai_client()` (AIProjectClient.get_openai_client, DefaultAzureCredential) — **simplificado vs plano original**: o spike T006 provou que a nova Responses API é stateless por chamada, sem "Agent" persistente a criar/reusar
+- [X] T023 [US1] Implement CollectorAgent in `src/radar/agents/collector_agent.py`: 4 perguntas concorrentes (asyncio.gather, obrigatório — 30s/pergunta medido no spike), heurística de domínio p/ source_type, snippet extraído via start_index/end_index da anotação, degradação graciosa (contracts §2)
+- [X] T024 [US1] Implement SynthesizerAgent in `src/radar/agents/synthesizer_agent.py`: prompt pt-BR com corpus numerado, `parse_synthesis_output` puro e testável, citação obrigatória por afirmação, divergence_note, evidence_id órfão → inferência + warning, retry 1x (contracts §3)
+- [X] T025 [US1] Implement orchestrator in `src/radar/orchestrator.py`: guarda MAX_ANALYSES_PER_DAY → doc `running` persistido → gather(acadêmico, mercado) → dedup → synthesize → grading → save final; budget com entrega parcial; corpus vazio → failed; corpus < 5 evidências pós-dedup → warning de baixa sustentação; ProgressEvent callbacks (contracts §6)
+- [X] T026 [US1] Integration test pipeline in `tests/integration/test_pipeline.py` (agentes/HTTP mockados): 6/6 passando — fluxo feliz, uma fonte degradada, mercado inteiro degradado mas acadêmico ok, todas degradadas → failed, timeout → partial, limite diário → RateLimitExceeded
 - [ ] T027 [P] [US1] Implement panel component in `app/components/panel.py`: 10 seções, badges de suporte (Alto/Médio/Baixo/Inferência), referências clicáveis (≤2 cliques — SC-006), avisos de degradação/parcial, divergence_note
 - [ ] T028 [P] [US1] Implement progress component in `app/components/progress.py` (etapas: acadêmica, mercado, consolidação, graduação, salvando — FR-008)
 - [ ] T029 [US1] Implement `app/Home.py`: input do tema, st.session_state guard contra rerun (R4), chama orchestrator com callback, renderiza painel ao concluir, erros amigáveis (RateLimitExceeded, falha total)
