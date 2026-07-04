@@ -72,9 +72,9 @@ e referências clicáveis; simular falha de fonte e verificar conclusão com avi
 - [X] T024 [US1] Implement SynthesizerAgent in `src/radar/agents/synthesizer_agent.py`: prompt pt-BR com corpus numerado, `parse_synthesis_output` puro e testável, citação obrigatória por afirmação, divergence_note, evidence_id órfão → inferência + warning, retry 1x (contracts §3)
 - [X] T025 [US1] Implement orchestrator in `src/radar/orchestrator.py`: guarda MAX_ANALYSES_PER_DAY → doc `running` persistido → gather(acadêmico, mercado) → dedup → synthesize → grading → save final; budget com entrega parcial; corpus vazio → failed; corpus < 5 evidências pós-dedup → warning de baixa sustentação; ProgressEvent callbacks (contracts §6)
 - [X] T026 [US1] Integration test pipeline in `tests/integration/test_pipeline.py` (agentes/HTTP mockados): 6/6 passando — fluxo feliz, uma fonte degradada, mercado inteiro degradado mas acadêmico ok, todas degradadas → failed, timeout → partial, limite diário → RateLimitExceeded
-- [ ] T027 [P] [US1] Implement panel component in `app/components/panel.py`: 10 seções, badges de suporte (Alto/Médio/Baixo/Inferência), referências clicáveis (≤2 cliques — SC-006), avisos de degradação/parcial, divergence_note
-- [ ] T028 [P] [US1] Implement progress component in `app/components/progress.py` (etapas: acadêmica, mercado, consolidação, graduação, salvando — FR-008)
-- [ ] T029 [US1] Implement `app/Home.py`: input do tema, st.session_state guard contra rerun (R4), chama orchestrator com callback, renderiza painel ao concluir, erros amigáveis (RateLimitExceeded, falha total)
+- [X] T027 [P] [US1] Implement panel component in `app/components/panel.py`: 10 seções, badges de suporte (Alto/Médio/Baixo/Inferência), referências clicáveis (≤2 cliques — SC-006), avisos de degradação/parcial, divergence_note
+- [X] T028 [P] [US1] Implement progress component in `app/components/progress.py` (etapas: acadêmica, mercado, consolidação, graduação, salvando — FR-008)
+- [X] T029 [US1] Implement `app/Home.py`: input do tema, st.session_state guard contra rerun (R4), chama orchestrator com callback, renderiza painel ao concluir, erros amigáveis (RateLimitExceeded, falha total). Validado: servidor sobe (health check OK, sem erro de import); smoke test com dados reais fica para T036
 
 **Checkpoint**: US1 completa — gerar painel de "Edge AI" end-to-end (com credenciais reais) e via testes mockados
 
