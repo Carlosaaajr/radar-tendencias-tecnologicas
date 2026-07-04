@@ -19,11 +19,11 @@ US3 exploração de evidências), com Setup e Foundational antes.
 
 **Purpose**: Estrutura do projeto e ferramentas
 
-- [ ] T001 Create project skeleton per plan.md: dirs `app/pages/`, `app/components/`, `src/radar/{collectors,agents,synthesis,storage}/`, `tests/{unit,integration,fixtures}/`, `docs/`, `infra/`, `data/reports/.gitkeep`, with `__init__.py` files
-- [ ] T002 Create `requirements.txt` (pinned: streamlit, azure-ai-projects, azure-identity, azure-cosmos, httpx, pydantic, pydantic-settings, python-dotenv, feedparser) and `requirements-dev.txt` (pytest, pytest-asyncio, respx, ruff); create venv and install
-- [ ] T003 [P] Create `.env.example` (all vars from quickstart.md §1), `.gitignore` (.env, .venv, data/reports/*.json, __pycache__), `.streamlit/config.toml` (headless, proxy-safe settings per R4)
-- [ ] T004 [P] Configure `pyproject.toml` with ruff (lint+format) and pytest settings (asyncio mode, `live` marker excluded by default)
-- [ ] T005 [P] Create `README.md` skeleton: o que é, arquitetura em 1 parágrafo, como rodar local, como testar, como fazer deploy (links p/ quickstart e docs/)
+- [X] T001 Create project skeleton per plan.md: dirs `app/pages/`, `app/components/`, `src/radar/{collectors,agents,synthesis,storage}/`, `tests/{unit,integration,fixtures}/`, `docs/`, `infra/`, `data/reports/.gitkeep`, with `__init__.py` files
+- [X] T002 Create `requirements.txt` (pinned: streamlit, azure-ai-projects, azure-identity, azure-cosmos, httpx, pydantic, pydantic-settings, python-dotenv, feedparser) and `requirements-dev.txt` (pytest, pytest-asyncio, respx, ruff); create venv and install
+- [X] T003 [P] Create `.env.example` (all vars from quickstart.md §1), `.gitignore` (.env, .venv, data/reports/*.json, __pycache__), `.streamlit/config.toml` (headless, proxy-safe settings per R4)
+- [X] T004 [P] Configure `pyproject.toml` with ruff (lint+format) and pytest settings (asyncio mode, `live` marker excluded by default)
+- [X] T005 [P] Create `README.md` skeleton: o que é, arquitetura em 1 parágrafo, como rodar local, como testar, como fazer deploy (links p/ quickstart e docs/)
 
 ---
 
