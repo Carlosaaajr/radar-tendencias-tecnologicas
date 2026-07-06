@@ -586,6 +586,21 @@ async function main() {
       iconRow(s, src.ic, src.label, src.sub, { x: sx, y, w: sw });
     });
 
+    s.addShape("line", {
+      x: MARGIN_X, y: 6.28, w: CONTENT_W, h: 0, line: { color: COLOR.border, width: 1 },
+    });
+    s.addText(
+      [
+        { text: "Técnica de Shao et al., STORM — NAACL 2024, ", options: { color: COLOR.muted } },
+        { text: "Stanford OVAL", options: { color: COLOR.accent, bold: true } },
+        { text: " (Open Virtual Assistant Lab). Adaptada, não importada — sem o framework `knowledge-storm`.", options: { color: COLOR.muted } },
+      ],
+      {
+        x: MARGIN_X, y: 6.4, w: CONTENT_W, h: 0.4,
+        fontFace: FONT_BODY, fontSize: 10.5, italic: true, align: "center", margin: 0,
+      }
+    );
+
     footer(s, 7);
   }
 

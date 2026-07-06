@@ -56,12 +56,26 @@ Além disso, o Foundry dá o Web Search tool nativo com citações estruturadas
 reinventar parsing de busca.
 
 **P: Explique a técnica "multi-perspectiva" — é STORM de verdade?**
-R: Inspirada no núcleo do STORM (Stanford): gerar perguntas sob perspectivas diferentes
-antes de responder, para diversificar evidências. Não importamos o framework STORM
-completo (ele não é compatível com o Agent Service e adicionaria peso desnecessário) —
-reproduzimos o princípio com 4 perguntas fixas (técnica, econômica, industrial,
+R: A técnica vem de pesquisa publicada e revisada por pares do **Stanford OVAL (Open
+Virtual Assistant Lab)** — não inventamos isso, adaptamos: Shao et al., *"Assisting in
+Writing Wikipedia-like Articles From Scratch with Large Language Models"* (NAACL 2024,
+[arXiv:2402.14207](https://arxiv.org/abs/2402.14207)). O núcleo que aplicamos é o
+*perspective-guided question asking*: gerar perguntas sob perspectivas diferentes antes
+de buscar, para diversificar evidências em vez de uma busca genérica única.
+Não importamos o framework `knowledge-storm` completo — ele depende de dspy/litellm e
+não é compatível com o Agent Service, além de adicionar peso desnecessário para o prazo.
+Reproduzimos o princípio com 4 perguntas fixas (técnica, econômica, industrial,
 regulatória) rodando **concorrentes**, porque medimos ~30s por pergunta no spike e
 sequencial estouraria o limite de 5 minutos (SC-001).
+
+**P: E o Co-STORM? Vocês usam o discurso colaborativo entre agentes?**
+R: Não — e é importante ser preciso aqui: o Co-STORM (Jiang et al., EMNLP 2024,
+[arXiv:2408.15232](https://arxiv.org/abs/2408.15232), mesmo laboratório) adiciona um
+protocolo de conversa colaborativa entre agentes com papéis distintos e um mapa mental
+dinâmico — não implementamos nada disso. Nossas 4 perguntas rodam em paralelo com
+templates fixos, não em diálogo sequencial entre agentes. Registramos o Co-STORM como
+evolução futura genuína: um "modo de exploração guiada" onde o usuário participaria do
+refinamento das perguntas, em vez de só receber o painel pronto.
 
 **P: Por que Web Search tool e não Bing Grounding, que estava no plano original?**
 R: Achado real de provisionamento, não escolha de conforto: GPT-4.1/4o estavam em

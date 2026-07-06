@@ -63,10 +63,28 @@ Decision / Rationale / Alternatives.
   SC-001 (≤5 min). As perguntas e respostas viram evidências tipadas.
 - **Rationale**: Reproduz o núcleo do STORM (perspective-guided question asking) sem
   importar o framework (dspy/litellm), que conflitaria com o Agent Service e o prazo
-  (Princípio II). Diversifica evidências e é argumento metodológico forte para a banca.
+  (Princípio II). Diversifica evidências e é argumento metodológico forte para a banca —
+  a técnica não foi inventada pelo projeto, vem de pesquisa publicada e revisada por
+  pares do **Stanford OVAL (Open Virtual Assistant Lab)**:
+  - Shao, Y., Jiang, Y., Kanell, T. A., Xu, P., Khattab, O., & Lam, M. S. (2024).
+    *Assisting in Writing Wikipedia-like Articles From Scratch with Large Language
+    Models*. NAACL 2024. [arXiv:2402.14207](https://arxiv.org/abs/2402.14207)
+    — origem do "perspective-guided question asking" (STORM) que este projeto adapta.
+  - Jiang, Y., Shao, Y., Ma, D., Semnani, S., & Lam, M. (2024). *Into the Unknown
+    Unknowns: Engaged Human Learning through Participation in Language Model Agent
+    Conversations*. EMNLP 2024. [arXiv:2408.15232](https://arxiv.org/abs/2408.15232)
+    — Co-STORM (discurso colaborativo entre agentes com papéis distintos + mapa mental
+    dinâmico); **não implementado** neste projeto, registrado como evolução futura
+    (ver seção de evoluções em `docs/critical-review.md`).
 - **Alternatives considered**: usar o pacote `knowledge-storm` completo — rejeitado
   (pipeline próprio incompatível com Foundry Agent Service; dependência pesada);
   busca única sem perspectivas — rejeitado (evidências homogêneas, grau de suporte pobre).
+- **Escopo do que foi de fato adaptado (para não superestimar na arguição)**: só o
+  princípio de gerar perguntas fixas sob perspectivas diferentes antes de buscar. **Não**
+  reproduzido: simulação de conversa multi-agente entre personas, refinamento iterativo
+  de perguntas a partir de respostas anteriores, geração de outline, ou o protocolo
+  colaborativo do Co-STORM (moderador, mapa mental). Aqui as 4 perguntas são templates
+  fixos e rodam em paralelo, não em diálogo sequencial.
 
 ## R3. Fontes acadêmicas determinísticas
 

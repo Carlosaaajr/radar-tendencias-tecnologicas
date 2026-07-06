@@ -226,3 +226,10 @@ prazo — registrados como limitação/evolução):
    execuções.
 5. Observabilidade de custo por consulta (Application Insights + metrics do Report).
 6. Avaliação de qualidade de evidência por fonte (ranking de confiabilidade).
+7. **Modo de exploração guiada inspirado no Co-STORM** (Jiang et al., EMNLP 2024,
+   Stanford OVAL — [arXiv:2408.15232](https://arxiv.org/abs/2408.15232)): hoje o
+   Coletor roda 4 perguntas fixas em paralelo (R2); o Co-STORM propõe um discurso
+   colaborativo entre agentes com papéis distintos e um mapa mental dinâmico, onde o
+   usuário participa do refinamento das perguntas em vez de só receber o painel
+   pronto. Não implementado nesta fase — registrado como evolução legítima, não como
+   funcionalidade já existente.
