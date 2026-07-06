@@ -3,7 +3,34 @@
 > Documento vivo exigido pelo Princípio VI da constituição. Atualizado a cada fase.
 > Base da seção de avaliação crítica da apresentação à banca.
 >
-> Última atualização: 2026-07-06 (smoke test real em produção — T036, ver seção abaixo)
+> Última atualização: 2026-07-06 (bug real de produção — App Setting corrompido, ver seção abaixo)
+
+## Bug real de produção — `COSMOS_KEY` vazio (2026-07-06)
+
+Reportado pelo usuário ao abrir a página **Histórico** em produção:
+`CosmosHttpResponseError (Unauthorized): Required Header authorization is missing`.
+
+**Causa raiz confirmada**: o App Setting `COSMOS_KEY` estava com **0 caracteres**
+(vazio), enquanto os demais 6 settings tinham comprimento correto. Rastreando a origem:
+durante o provisionamento (T035), o comando `az webapp config appsettings set ...
+COSMOS_KEY="$(az cosmosdb keys list ...)"` foi executado em uma sessão com
+`ConnectionResetError` recorrente no mesmo endpoint (documentado acima). É quase certo
+que o comando interno (`az cosmosdb keys list`) tenha retornado stdout vazio devido a um
+desses resets, e o comando externo prosseguiu normalmente com a substituição já vazia —
+o retorno da CLI listou o nome do setting como presente (`COSMOS_KEY` apareceu na saída),
+mascarando que o **valor** estava vazio. A verificação feita na hora (`--query
+"[].name"`) não pegou isso porque só conferia presença do nome, não o conteúdo.
+
+**Correção**: buscar a chave novamente (rede estável desta vez, confirmado 88
+caracteres) e regravar o App Setting, verificando explicitamente o comprimento do valor
+antes e depois (`length(value)` via `az webapp config appsettings list`), não apenas a
+presença do nome. Os outros 6 settings foram auditados da mesma forma — todos corretos.
+
+**Lição para o relato de avaliação crítica**: uma verificação que confere apenas "a
+chave existe" é insuficiente para segredos herdados de comando `$(...)` — é preciso
+confirmar o comprimento/conteúdo, porque uma substituição vazia ainda produz uma
+execução "bem-sucedida" do ponto de vista do código de saída. `infra/provision.md`
+atualizado com esse passo de verificação.
 
 ## Achado real de provisionamento (2026-07-04)
 

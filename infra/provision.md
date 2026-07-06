@@ -80,6 +80,21 @@ az webapp config appsettings set -n $APP_NAME -g $RG --settings \
   SCM_DO_BUILD_DURING_DEPLOYMENT="true"
 ```
 
+**⚠️ Verificação obrigatória** (achado real de bug, 2026-07-06): em rede instável, o
+comando `$(az cosmosdb keys list ...)` pode retornar vazio silenciosamente enquanto o
+`az webapp config appsettings set` externo ainda "sucede" — gravando `COSMOS_KEY=""`
+sem erro aparente. Checar apenas se o nome do setting existe **não é suficiente**;
+confirme o **comprimento do valor**:
+
+```bash
+az webapp config appsettings list -n $APP_NAME -g $RG \
+  --query "[].{name:name, valueLength:length(value)}" -o table
+# COSMOS_KEY deve ter ~88 caracteres — nunca 0
+```
+
+Se `COSMOS_KEY` aparecer com `valueLength: 0`, refazer o `az cosmosdb keys list` (rede
+estável) e regravar apenas esse setting.
+
 ## 5. Deploy (zip deploy)
 
 ```bash
