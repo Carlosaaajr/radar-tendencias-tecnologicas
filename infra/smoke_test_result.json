@@ -1,0 +1,37 @@
+[
+  {
+    "theme": "Edge AI",
+    "status": "completed",
+    "elapsed_seconds": 123.0,
+    "evidence_count": 53,
+    "source_type_count": 4,
+    "source_types": [
+      "corporate",
+      "market",
+      "news",
+      "scientific"
+    ],
+    "sections_count": 10,
+    "degraded_sources": [],
+    "warnings": [],
+    "sc001_pass_5min": true,
+    "sc005_pass_3_types": true
+  },
+  {
+    "theme": "Robôs Humanoides para Indústria",
+    "status": "completed",
+    "elapsed_seconds": 36.8,
+    "evidence_count": 44,
+    "source_type_count": 3,
+    "source_types": [
+      "market",
+      "news",
+      "scientific"
+    ],
+    "sections_count": 10,
+    "degraded_sources": [],
+    "warnings": [],
+    "sc001_pass_5min": true,
+    "sc005_pass_3_types": true
+  }
+]

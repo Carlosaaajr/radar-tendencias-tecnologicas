@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from radar.agents.collector_agent import run_market_collection
-from radar.agents.synthesizer_agent import SynthesisError, synthesize
+from radar.agents.synthesizer_agent import synthesize
 from radar.collectors.arxiv import ArxivCollector
 from radar.collectors.openalex import OpenAlexCollector
 from radar.config import get_settings
@@ -137,7 +137,8 @@ async def run_analysis(
             synthesize(theme, deduped), timeout=budget * 0.25
         )
         emit("synthesis", "Painel consolidado", done=True)
-    except (TimeoutError, SynthesisError) as exc:
+    except Exception as exc:  # noqa: BLE001 — falha da API do Foundry (timeout,
+        # SynthesisError, RateLimitError etc.) nunca pode derrubar a análise (FR-013)
         report.status = ReportStatus.PARTIAL
         report.evidence = deduped
         report.degraded_sources = degraded_sources

@@ -176,13 +176,22 @@ Decision / Rationale / Alternatives.
 - **Decision**: Três freios no MVP: (1) **Access Restrictions** no App Service
   (allowlist de IP; liberado apenas durante a demo); (2) limite de análises/dia no
   orquestrador (default 10, configurável via `MAX_ANALYSES_PER_DAY`), verificado antes
-  de iniciar o pipeline; (3) **Azure Budget alert** (~US$30/mês) na assinatura + TPM
-  baixo no deployment `gpt-5-radar` (capacidade 10, isolado dos demais usos da conta).
+  de iniciar o pipeline; (3) **Azure Budget alert** (~US$30/mês, criado manualmente no
+  portal — `az consumption budget create` tem bug reproduzível nesta API preview) + TPM
+  moderado no deployment `gpt-5-radar` (capacidade **50**, isolado dos demais usos da
+  conta — ver achado do smoke test abaixo).
 - **Rationale**: App público sem auth executando pipeline pago (~US$0,30-0,60/análise)
   em domínio `*.azurewebsites.net` varrível por bots = risco real de custo (achado ALTO).
-  Usuário único sem auth continua como decisão de produto; os freios custam horas. TPM
-  baixo aplica-se ao deployment `gpt-5-radar` (capacidade 10, isolado do restante da
-  conta `omc-cli` usado por outras ferramentas).
+  Usuário único sem auth continua como decisão de produto; os freios custam horas.
+- **Achado real do smoke test (T036, 2026-07-05)**: a capacidade inicial de 10 unidades
+  causou `RateLimitError (429)` real durante a síntese de uma análise legítima (4
+  buscas web concorrentes + 1 chamada de síntese sobre o corpus consolidado excedem 10
+  unidades). Aumentada para **50** — ainda um teto explícito e modesto (não
+  "ilimitado"), suficiente para uma análise completa sem risco de rate limit em uso
+  normal. Esse mesmo evento revelou um gap de resiliência real: o orquestrador só
+  tratava `TimeoutError`/`SynthesisError` na etapa de síntese, não erros de API do SDK
+  (`openai.RateLimitError`) — corrigido para tratar qualquer exceção da síntese como
+  `status=partial` (Princípio IV).
 - **Alternatives considered**: Easy Auth (Entra built-in) — plano B de custo zero em
   código, mas exige validar interferência com WebSocket do Streamlit; adiado para
   evolução futura junto com multiusuário.

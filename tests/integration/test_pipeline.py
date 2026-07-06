@@ -153,6 +153,31 @@ async def test_market_fully_degraded_academic_ok_still_completes():
 
 
 @pytest.mark.asyncio
+async def test_synthesis_api_error_yields_partial_not_crash():
+    """Regressao: erro de API do Foundry na sintese (ex.: RateLimitError 429, achado
+    real do smoke test T036) MUST virar status=partial, nunca propagar sem tratamento."""
+    academic = CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC)])
+    market = CollectorResult(evidence=[_ev("ev-201", SourceType.MARKET)])
+
+    async def failing_synthesize(theme, corpus, *, timeout_s=120):
+        raise RuntimeError("Model deployment rate limit exceeded")
+
+    with (
+        patch("radar.orchestrator.ArxivCollector") as MockArxiv,
+        patch("radar.orchestrator.OpenAlexCollector") as MockOpenAlex,
+        patch("radar.orchestrator.run_market_collection", new=AsyncMock(return_value=market)),
+        patch("radar.orchestrator.synthesize", side_effect=failing_synthesize),
+    ):
+        MockArxiv.return_value.collect = AsyncMock(return_value=academic)
+        MockOpenAlex.return_value.collect = AsyncMock(return_value=CollectorResult(evidence=[]))
+
+        report = await run_analysis("Edge AI")
+
+    assert report.status == ReportStatus.PARTIAL
+    assert any("Falha na síntese" in w for w in report.warnings)
+
+
+@pytest.mark.asyncio
 async def test_all_sources_degraded_fails():
     empty_degraded = CollectorResult(evidence=[], degraded=True, error="down")
 

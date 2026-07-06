@@ -8,7 +8,7 @@ import httpx
 from radar.collectors.base import CollectorResult
 from radar.models import SNIPPET_MAX_LENGTH, Evidence, SourceType
 
-ARXIV_API_URL = "http://export.arxiv.org/api/query"
+ARXIV_API_URL = "https://export.arxiv.org/api/query"
 
 
 class ArxivCollector:

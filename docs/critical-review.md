@@ -3,7 +3,7 @@
 > Documento vivo exigido pelo Princípio VI da constituição. Atualizado a cada fase.
 > Base da seção de avaliação crítica da apresentação à banca.
 >
-> Última atualização: 2026-07-04 (provisionamento real — pivot Web Search tool, ver R1)
+> Última atualização: 2026-07-06 (smoke test real em produção — T036, ver seção abaixo)
 
 ## Achado real de provisionamento (2026-07-04)
 
@@ -56,6 +56,61 @@ Ao provisionar Cosmos DB + App Service, dois achados adicionais de infraestrutur
 Aprendizado para a apresentação: capacidade regional de serviços gerenciados **não é
 garantida nem estável** — o plano de arquitetura deve sempre ter uma região alternativa
 pronta (aqui, colocalizar com o Foundry em `brazilsouth` resolveu dois problemas de uma vez).
+
+## Smoke test T036 — resultado real (2026-07-06)
+
+Executado via `infra/smoke_test.py` contra Foundry e Cosmos de produção, para os 2
+temas do desafio. Após corrigir 3 problemas reais encontrados no processo (abaixo),
+**ambos completaram com sucesso**, sem degradação:
+
+| Tema | Status | Duração | Evidências | Tipos de fonte | Seções | SC-001 (≤5min) | SC-005 (≥3 tipos) |
+|---|---|---|---|---|---|---|---|
+| Edge AI | completed | 123,0s | 53 | 4 (corporate, market, news, scientific) | 10/10 | ✅ | ✅ |
+| Robôs Humanoides para Indústria | completed | 36,8s | 44 | 3 (market, news, scientific) | 10/10 | ✅ | ✅ |
+
+**3 problemas reais encontrados e corrigidos durante o smoke test** (nenhum havia
+aparecido em testes mockados — só surgem contra as APIs reais):
+
+1. **arXiv migrou para HTTPS**: `http://export.arxiv.org` agora devolve `301 Redirect`
+   para `https://`; o `httpx.AsyncClient` não segue redirect por padrão, então o
+   `ArxivCollector` degradava 100% das vezes. Corrigido: URL base agora `https://`
+   diretamente.
+2. **Capacidade do deployment insuficiente para uso real**: a capacidade de 10 unidades
+   (definida deliberadamente baixa por R10) causou `RateLimitError (429)` real logo na
+   primeira tentativa — 4 buscas web concorrentes + síntese excedem 10 unidades. A cota
+   da assinatura tinha bastante folga (300 de 30.000 usados na região `brazilsouth`
+   para `gpt-5.4-mini`); aumentada para **50** (ainda insuficiente sob a mesma carga) e
+   depois para **200** — TPM ainda moderado frente ao teto da assinatura, mas suficiente
+   para uma análise completa.
+3. **Síntese não tratava erro de API do SDK**: o `except` em torno da chamada ao
+   Sintetizador só cobria `TimeoutError`/`SynthesisError`; um `openai.RateLimitError`
+   real escapava sem tratamento e derrubava o processo inteiro. Corrigido para capturar
+   qualquer exceção da síntese como `status=partial` — validado: a tentativa anterior
+   (antes da correção) já demonstrou o comportamento correto de degradação em vez de
+   crash, confirmando o Princípio IV na prática.
+
+Essas 3 correções (mais as 3 do code review) elevam de 40 para **43 testes
+automatizados** (3 novos testes de regressão específicos para os bugs H1/H2/rate-limit,
+mais validação end-to-end real contra produção). Resultado bruto em
+`infra/smoke_test_result.json`.
+
+**Gap conhecido**: `Report.metrics` permanece não populado (achado B2 do code review) —
+não há breakdown de tokens/custo por etapa gravado no documento. Custo real por análise
+deve ser confirmado via Azure Cost Management (`radar-trends` + `ai-models-resource`)
+após a fatura processar, não pelos números abaixo, que continuam sendo estimativas.
+
+**⚠️ Redeploy pendente**: as 2 correções acima (arXiv HTTPS, síntese resiliente a
+`RateLimitError`) foram validadas localmente com sucesso (smoke test rodou contra
+Foundry/Cosmos de produção usando `az login`), mas **o App Service em produção ainda
+roda o código anterior** a essas correções — 8 tentativas consecutivas de redeploy
+(`az webapp deploy` e `az webapp deployment source config-zip`) falharam com
+`ConnectionResetError` especificamente ao contatar o endpoint SCM/Kudu, enquanto outras
+chamadas Azure (Cosmos, role assignments, `az account show`) funcionavam normalmente na
+mesma sessão. Não é um problema do código nem da configuração do App Service — é uma
+limitação de rede desta sessão específica com esse endpoint. O comando de deploy exato
+está documentado em `infra/provision.md` §5; rodar de outra rede/máquina deve resolver.
+O aumento de capacidade do deployment (10→200) **já está em produção** (é configuração
+de infraestrutura, não depende de redeploy de código).
 
 ## Custos estimados
 
