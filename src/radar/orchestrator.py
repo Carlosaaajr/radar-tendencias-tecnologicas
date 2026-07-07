@@ -152,7 +152,7 @@ async def run_analysis(
     try:
         emit("synthesis", "Consolidando painel executivo...")
         synthesis_result = await asyncio.wait_for(
-            synthesize(theme, deduped), timeout=budget * 0.25
+            synthesize(theme, deduped), timeout=budget * 0.4
         )
         emit("synthesis", "Painel consolidado", done=True)
     except Exception as exc:  # noqa: BLE001 — falha da API do Foundry (timeout,

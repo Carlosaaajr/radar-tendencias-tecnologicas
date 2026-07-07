@@ -45,7 +45,18 @@ tem: key (uma de: definition, maturity, applications, sectors, players, investme
 adoption_signals, opportunities, risks, outlook), content_md, evidence_ids (lista de ids
 citados), is_inference (true se não houver evidência direta), divergence_note (texto ou
 null, preenchido quando as fontes discordam). NUNCA afirme algo sem citar um id existente;
-se não houver lastro, marque is_inference=true e evidence_ids=[]."""
+se não houver lastro, marque is_inference=true e evidence_ids=[].
+
+Para content_md, escreva uma análise elaborada de até 20 linhas (não um parágrafo curto
+de 3-4 frases) em Markdown, combinando texto corrido com marcadores quando útil:
+- Abra com 1-2 frases de contexto/definição do ponto central da seção.
+- Desenvolva com detalhes concretos das evidências: números, nomes de empresas/produtos,
+  datas, tendências específicas — não generalidades vagas.
+- Quando houver 3+ evidências relacionadas, prefira uma lista com marcadores (um item por
+  evidência ou grupo de evidências correlatas) em vez de um único parágrafo denso.
+- Feche com 1 frase de síntese ou implicação prática do que foi apresentado.
+Mantenha cada afirmação factual citada com o id da evidência correspondente, mesmo dentro
+de itens de lista."""
 
 
 def parse_synthesis_output(raw: dict, corpus: dict[str, Evidence]) -> SynthesisResult:
@@ -89,7 +100,7 @@ def parse_synthesis_output(raw: dict, corpus: dict[str, Evidence]) -> SynthesisR
 
 
 async def synthesize(
-    theme: str, corpus: list[Evidence], *, timeout_s: float = 120
+    theme: str, corpus: list[Evidence], *, timeout_s: float = 150
 ) -> SynthesisResult:
     corpus_by_id = {ev.id: ev for ev in corpus}
     prompt = _build_prompt(theme, corpus_by_id)
