@@ -73,8 +73,12 @@ R: Não — e é importante ser preciso aqui: o Co-STORM (Jiang et al., EMNLP 20
 [arXiv:2408.15232](https://arxiv.org/abs/2408.15232), mesmo laboratório) adiciona um
 protocolo de conversa colaborativa entre agentes com papéis distintos e um mapa mental
 dinâmico — não implementamos nada disso. Nossas 4 perguntas rodam em paralelo com
-templates fixos, não em diálogo sequencial entre agentes. Registramos o Co-STORM como
-evolução futura genuína: um "modo de exploração guiada" onde o usuário participaria do
+templates fixos, não em diálogo sequencial entre agentes. Registramos a adoção do
+Co-STORM como evolução futura genuína, com dois ganhos potenciais: na **coleta**,
+perguntas se refinariam a partir do que já foi encontrado em vez das 4 perspectivas
+fixas de hoje; na **síntese**, o mapa mental dinâmico já entregaria o corpus
+pré-organizado por tópico ao Sintetizador, em vez de uma lista plana de evidências.
+Também abriria um "modo de exploração guiada" onde o usuário participaria do
 refinamento das perguntas, em vez de só receber o painel pronto.
 
 **P: Por que Web Search tool e não Bing Grounding, que estava no plano original?**
@@ -149,6 +153,20 @@ R: Patentes são cobertas só por sinais via busca web, sem API dedicada (EPO OP
 avaliada e descartada pelo prazo — documentado com o motivo). E o app roda em processo
 único: se o App Service reiniciar no meio de uma análise, ela fica órfã (mitigado por
 marcar o relatório como "incompleto" no histórico, não como "completo").
+
+**P: Os gráficos novos do painel executivo (mix de fontes, linha do tempo etc.) sempre
+aparecem todos?**
+R: Não por acaso — cada gráfico usa o subconjunto de evidência que ele consegue
+sustentar honestamente. "Mix por tipo de fonte" e "Fontes mais citadas" contam toda
+evidência coletada; "Publicações por ano" e "Idioma das fontes" só contam o que tem o
+dado necessário (`published_at`, `language`). Achado real (2026-07-07): em temas com
+forte presença de notícia/mercado, só ~24% das evidências têm data de publicação
+confiável (as científicas quase sempre têm; as de Web Search raramente trazem uma data
+que o modelo consiga extrair da página). Por isso a linha do tempo só renderiza com ≥5
+evidências datadas cobrindo ≥2 anos — abaixo disso, mostra um aviso em vez de sugerir
+uma tendência que o dado não sustenta. Documentado em `docs/critical-review.md` como
+limitação real, com evolução futura registrada (inferir ano de publicação a partir do
+conteúdo da página quando a metadata estruturada faltar).
 
 **P: O sistema é seguro? Alguém pode manipular o resultado enviando um tema malicioso?**
 R: Tema do usuário entra sem sanitização no prompt — risco real de prompt injection,

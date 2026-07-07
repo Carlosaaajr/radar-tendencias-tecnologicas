@@ -117,25 +117,46 @@ estimativa. Como a aplicação é pública e sem autenticação nesta fase, os f
 capacidade de token baixa no deployment) são parte deliberada do desenho, não um
 afterthought.
 
-**Vieses conhecidos.** Quatro vieses estruturais foram identificados e documentados: viés
+**Vieses conhecidos.** Seis vieses estruturais foram identificados e documentados: viés
 de fonte (o corpus depende do que consultorias como Gartner/McKinsey publicam
 gratuitamente; mitigado nas fontes acadêmicas pela cobertura multidisciplinar da OpenAlex
 frente ao viés de arXiv para CS/física), viés de idioma (corpus majoritariamente em
 inglês), viés de modelo (o Sintetizador pode privilegiar narrativas dominantes em seu
 treinamento — mitigação estrutural: o grau de suporte é calculado em código, nunca
-autoavaliado pelo LLM) e viés de recorte do buscador (o provedor por trás do Web Search
+autoavaliado pelo LLM), viés de recorte do buscador (o provedor por trás do Web Search
 tool decide o que o Coletor enxerga, parcialmente mitigado pelas 4 perspectivas
-concorrentes inspiradas em STORM).
+concorrentes inspiradas em STORM), viés de cobertura de metadado (achado real de
+2026-07-07: evidências científicas quase sempre trazem data de publicação estruturada,
+enquanto evidências de notícia/mercado coletadas via Web Search raramente trazem uma
+data confiável — em temas com forte presença de mercado, só ~24% das evidências têm
+data; os gráficos do painel executivo tratam isso de forma honesta, computando
+"Publicações por ano" apenas sobre o subconjunto datado e exibindo um aviso em vez do
+gráfico quando o dado é insuficiente, em vez de sugerir uma tendência temporal que o
+corpus não sustenta) e viés de recorte de aplicação nos coletores acadêmicos (achado
+real de 2026-07-07: busca literal por palavra-chave em temas sem qualificação de
+domínio — ex.: "IoT" em vez de "IoT industrial" — podia devolver evidência sem
+correlação com o ambiente industrial; mitigado com uma heurística determinística,
+`src/radar/collectors/industrial_scope.py`, que qualifica a query booleana enviada às
+APIs quando o tema não traz recorte industrial explícito, validada contra as APIs
+reais).
 
-**Evoluções futuras.** Priorizadas por valor/esforço: (1) um modo de exploração guiada
-inspirado no **Co-STORM** (Jiang et al., EMNLP 2024, Stanford OVAL) — hoje o Coletor roda
-4 perguntas fixas em paralelo; o Co-STORM propõe um discurso colaborativo entre agentes
-com papéis distintos e participação do usuário no refinamento das perguntas, em vez de só
-entregar o painel pronto; (2) uma API dedicada de patentes (EPO OPS, cobertura mundial
+**Evoluções futuras.** Priorizadas por valor/esforço: (1) adoção da metodologia
+**Co-STORM** (Jiang et al., EMNLP 2024, Stanford OVAL) para melhorar coleta e síntese —
+hoje o Coletor roda 4 perguntas fixas em paralelo; o Co-STORM propõe um discurso
+colaborativo entre agentes com papéis distintos e um mapa mental dinâmico compartilhado,
+que refinaria as perguntas de busca a partir do que já foi encontrado (em vez das 4
+perspectivas fixas) e entregaria ao Sintetizador um corpus já pré-organizado por tópico
+(em vez de uma lista plana de evidências), além de habilitar participação do usuário no
+refinamento das perguntas; (2) uma API dedicada de patentes (EPO OPS, cobertura mundial
 incluindo Brasil, conta gratuita), já que o MVP cobre patentes apenas por sinais via busca
 web; (3) autenticação multiusuário (Easy Auth/Entra ID) e Key Vault + RBAC no plano de
 dados do Cosmos; (4) monitoramento contínuo agendado de temas (Azure Functions timer)
 com diff entre execuções; (5) observabilidade de custo por consulta via Application
-Insights. Nenhum desses itens está implementado — estão aqui exatamente para mostrar que
-as fronteiras do sistema são conhecidas e conscientes, não descobertas de surpresa pela
-banca.
+Insights; (6) inferência de ano de publicação pelo Agente Coletor quando a página não
+expõe metadata estruturada, para aumentar a cobertura do gráfico "Publicações por ano"
+sem comprometer a integridade do dado; (7) agente de IA para refinamento semântico de
+query dos coletores acadêmicos, complementando a heurística determinística atual
+(`industrial_scope.py`) que hoje mitiga temas sem recorte de aplicação industrial (ex.:
+"IoT" sem qualificação). Nenhum desses itens está implementado — estão aqui exatamente
+para mostrar que as fronteiras do sistema são conhecidas e conscientes, não descobertas
+de surpresa pela banca.

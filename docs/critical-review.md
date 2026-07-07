@@ -173,6 +173,52 @@ nesta fase de planejamento.
 **Freios de abuso** (app público sem auth — R10): Access Restrictions por IP, limite
 `MAX_ANALYSES_PER_DAY=10`, budget alert de US$30/mês, TPM baixo no deployment.
 
+## Limitação real — cobertura desigual de data de publicação entre tipos de fonte (2026-07-07)
+
+Achado ao revisar o gráfico "Publicações por ano" do painel executivo (`app/components/charts.py`,
+`_render_timeline`) contra um relatório real do tema "Manutenção assistida por IA Generativa e
+Multiagentes de IA": apenas 11 das 46 evidências (24%) tinham `published_at` preenchido, quase
+todas científicas — arXiv/OpenAlex retornam metadados estruturados de data, enquanto evidências de
+notícia/mercado/corporativas/patentes (coletadas via Web Search do Agente Coletor) raramente trazem
+uma data de publicação que o modelo consiga extrair com confiança da página.
+
+Por isso os gráficos do painel executivo operam sobre subconjuntos diferentes de evidência por
+design: "Mix por tipo de fonte" e "Fontes mais citadas" contam todas as evidências; "Publicações
+por ano" e "Idioma das fontes" só contam o que tem o dado necessário. Mitigação já implementada: a
+linha do tempo só renderiza com ≥5 evidências datadas cobrindo ≥2 anos distintos — abaixo disso,
+mostra uma legenda explicando a insuficiência de dado em vez de sugerir uma tendência temporal que
+os dados não sustentam (mesma lógica para o gráfico de idioma quando só 1 idioma está presente).
+
+Evolução futura: instruir o Agente Coletor a inferir um ano aproximado de publicação a partir do
+conteúdo da página quando a metadata estruturada não estiver disponível, aumentando a cobertura do
+gráfico sem comprometer a integridade do dado (ver item correspondente em Evoluções futuras).
+
+## Limitação real — coletores acadêmicos sem recorte de aplicação industrial (2026-07-07)
+
+Achado ao analisar temas amplos sem qualificação de domínio (ex.: "IoT" em vez de "IoT
+industrial"): `ArxivCollector` e `OpenAlexCollector` fazem busca **literal por palavra-chave**
+(`search_query: all:{theme}` / `search: {theme}`) sem nenhum recorte de aplicação. Para um tema
+como "IoT", isso pode devolver artigos de IoT agrícola, residencial ou de saúde — sem correlação
+com o ambiente industrial que a plataforma existe para analisar — o que arrasta o corpus para
+longe do domínio e rebaixa o grau de suporte de seções que, com a evidência certa, seriam bem
+sustentadas.
+
+**Mitigação implementada (determinística, sem custo de LLM)**: `src/radar/collectors/industrial_scope.py`
+decide, por uma lista fixa de termos em PT/EN (`industrial`, `manufacturing`, `indústria 4.0`,
+`chão de fábrica` etc.), se o tema já traz um recorte industrial explícito. Quando não traz, a
+query enviada às APIs (nunca o campo `theme` do relatório, que permanece o texto literal do
+usuário) é aumentada com uma cláusula booleana `AND (industrial OR manufacturing OR "industry
+4.0")` — suportada nativamente tanto pelo arXiv (`search_query`) quanto pelo OpenAlex (`search`,
+que documenta operadores booleanos). Quando o tema já contém um qualificador industrial, a query
+não é alterada. Testado (`tests/unit/test_industrial_scope.py`,
+`tests/unit/test_collectors.py`).
+
+**Limitação residual**: a lista de termos-gatilho é fixa e apenas em PT/EN — um tema qualificado
+em outro idioma, ou com um sinônimo de indústria fora da lista, não é detectado e recebe a mesma
+qualificação (inofensivo, mas redundante). A qualificação booleana em si é uma heurística rígida:
+resolve o caso comum (tema genérico sem contexto), mas não infere nuance de domínio como um
+agente de IA faria. Ver evolução futura correspondente abaixo.
+
 ## Vieses conhecidos
 
 - **De fonte**: consultorias pagas (Gartner/McKinsey) entram só pelo material público —
@@ -253,10 +299,36 @@ prazo — registrados como limitação/evolução):
    execuções.
 5. Observabilidade de custo por consulta (Application Insights + metrics do Report).
 6. Avaliação de qualidade de evidência por fonte (ranking de confiabilidade).
-7. **Modo de exploração guiada inspirado no Co-STORM** (Jiang et al., EMNLP 2024,
-   Stanford OVAL — [arXiv:2408.15232](https://arxiv.org/abs/2408.15232)): hoje o
-   Coletor roda 4 perguntas fixas em paralelo (R2); o Co-STORM propõe um discurso
-   colaborativo entre agentes com papéis distintos e um mapa mental dinâmico, onde o
-   usuário participa do refinamento das perguntas em vez de só receber o painel
-   pronto. Não implementado nesta fase — registrado como evolução legítima, não como
-   funcionalidade já existente.
+7. **Adoção da metodologia Co-STORM para melhorar coleta e síntese** (Jiang et al.,
+   EMNLP 2024, Stanford OVAL — [arXiv:2408.15232](https://arxiv.org/abs/2408.15232)):
+   hoje o Coletor roda 4 perguntas fixas em paralelo (R2) e o Sintetizador consolida o
+   corpus numa única passada, sem diálogo entre os dois. O Co-STORM propõe um discurso
+   colaborativo entre agentes com papéis distintos (especialistas + moderador) e um
+   mapa mental dinâmico compartilhado, com dois ganhos potenciais para este projeto:
+   - **Busca**: perguntas subsequentes se refinam a partir do que já foi encontrado
+     (em vez das 4 perguntas fixas de hoje), preenchendo lacunas específicas do tema em
+     vez de perspectivas genéricas — reduz o risco de subcobertura em temas de nicho.
+   - **Síntese**: o mapa mental dinâmico do Co-STORM já organiza evidências por tópico
+     durante a coleta, o que poderia alimentar o Sintetizador com um corpus
+     pré-estruturado em vez de uma lista plana de evidências — plausivelmente
+     melhorando a coerência entre seções e reduzindo divergência não detectada.
+   - Também abre a porta para um **modo de exploração guiada**, onde o usuário
+     participa do refinamento das perguntas em vez de só receber o painel pronto.
+   Não implementado nesta fase — registrado como evolução legítima, não como
+   funcionalidade já existente. Custo esperado: mais chamadas de agente por análise
+   (rodada de refinamento adicional), a pesar contra o orçamento de tempo (R2/SC-001) e
+   o freio de capacidade de token do deployment (R10).
+8. Inferência de ano de publicação pelo Agente Coletor quando a página não expõe
+   metadata estruturada, para aumentar a cobertura do gráfico "Publicações por ano"
+   (hoje só 24% das evidências têm data em temas com forte presença de notícia/mercado
+   — achado real de 2026-07-07, ver Limitações conhecidas).
+9. **Agente de IA para refinamento semântico de query dos coletores acadêmicos**: a
+   mitigação atual do achado "coletores sem recorte de aplicação industrial" (acima) é
+   uma heurística determinística (lista fixa de termos-gatilho PT/EN). Uma evolução
+   natural é substituir/complementar essa heurística por uma chamada curta e barata ao
+   Foundry (mesmo padrão do `scope_guard.py`, R11) que reescreva a query com nuance
+   semântica de domínio antes de consultar arXiv/OpenAlex — capturando sinônimos,
+   termos técnicos específicos do setor e idiomas fora da lista fixa, que a heurística
+   atual não alcança. Mantém os coletores em si determinísticos (chamada HTTP direta);
+   o agente de IA atuaria só na etapa de formulação da query, não na graduação do
+   suporte (Princípio I permanece intacto). Não implementado nesta fase.

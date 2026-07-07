@@ -191,6 +191,8 @@ async function main() {
     ["bug", "FaBug", COLOR.danger],
     ["wrench", "FaWrench", COLOR.accent],
     ["play", "FaPlay", COLOR.accent],
+    ["book", "FaBook", COLOR.accent],
+    ["clipboardList", "FaClipboardList", COLOR.accent],
   ];
   for (const [key, comp, col] of iconSpecs) {
     ic[key] = await icon(comp, col, 256);
@@ -781,7 +783,91 @@ async function main() {
   }
 
   // =========================================================================
-  // SLIDE 12 — Avaliação crítica: custos
+  // SLIDE 12 — Documentação e gestão do conhecimento
+  // =========================================================================
+  {
+    const s = baseSlide(pres);
+    kicker(s, "Qualidade de implementação");
+    title(s, "Documentação como maturidade de gestão do conhecimento");
+
+    const docs = [
+      { ic: ic.book, h: "README.md", d: "visão geral, arquitetura em 1 parágrafo e quickstart" },
+      { ic: ic.projectDiagram, h: "docs/architecture.md", d: "decisões técnicas e justificativas, com diagrama" },
+      { ic: ic.warn, h: "docs/critical-review.md", d: "autoavaliação crítica contínua, achados reais datados" },
+      { ic: ic.wrench, h: "infra/provision.md + RUNBOOK", d: "provisionamento, deploy e operação passo a passo" },
+      { ic: ic.clipboardList, h: "Spec-Kit (constitution → spec → plan → tasks)", d: "especificação formal e rastreável, não improvisada" },
+      { ic: ic.certificate, h: "Guia de arguição + critérios de avaliação", d: "material de defesa mapeado aos critérios da banca" },
+      { ic: ic.layerGroup, h: "Project Book (novo)", d: "referência única do projeto para quem herdar ou avaliar" },
+    ];
+    const leftX = MARGIN_X, leftW = 7.0;
+    let dy = 2.0;
+    const rowH = 0.565;
+    docs.forEach((it) => {
+      iconBadge(s, it.ic, { x: leftX, y: dy, d: 0.4, bg: COLOR.accentSoft, iconScale: 0.52 });
+      s.addText(
+        [
+          { text: it.h + "  ", options: { bold: true, color: COLOR.text } },
+          { text: "— " + it.d, options: { color: COLOR.muted } },
+        ],
+        {
+          x: leftX + 0.52, y: dy - 0.06, w: leftW - 0.52, h: rowH,
+          fontFace: FONT_BODY, fontSize: 11.5, valign: "middle", margin: 0,
+        }
+      );
+      dy += rowH;
+    });
+
+    // Right: knowledge-graph callout — the innovation
+    const rx = leftX + leftW + 0.35, rw = PAGE_W - MARGIN_X - rx;
+    panel(s, { x: rx, y: 2.0, w: rw, h: dy - 2.0 - 0.05, fill: COLOR.card2 });
+    iconBadge(s, ic.brain, { x: rx + 0.3, y: 2.28, d: 0.6, bg: COLOR.accentSoft });
+    s.addText("Grafo de conhecimento", {
+      x: rx + 1.05, y: 2.3, w: rw - 1.3, h: 0.4,
+      fontFace: FONT_BODY, fontSize: 14, bold: true, color: COLOR.text, margin: 0,
+    });
+    s.addText("Inovação — não um markdown a mais", {
+      x: rx + 1.05, y: 2.62, w: rw - 1.3, h: 0.3,
+      fontFace: FONT_BODY, fontSize: 10.5, italic: true, color: COLOR.accent, margin: 0,
+    });
+    s.addText("194 nós · 334 arestas · 9 camadas · 15 passos guiados", {
+      x: rx + 0.3, y: 3.15, w: rw - 0.6, h: 0.5,
+      fontFace: FONT_HEAD, fontSize: 12.5, bold: true, color: COLOR.accent, margin: 0,
+    });
+    s.addText(
+      "Extraído automaticamente do código-fonte real via IA — documentação viva que nunca fica desatualizada, navegável por um tour guiado interativo. Pouco comum neste tipo de projeto.",
+      {
+        x: rx + 0.3, y: 3.65, w: rw - 0.6, h: dy - 3.65 - 0.15,
+        fontFace: FONT_BODY, fontSize: 11, color: COLOR.muted, margin: 0, valign: "top",
+      }
+    );
+
+    // Bottom strip: standards/practices followed
+    const stripY = dy + 0.15;
+    s.addShape(pptxgenPres.shapes.RECTANGLE, {
+      x: MARGIN_X, y: stripY, w: CONTENT_W, h: 0.85,
+      fill: { color: COLOR.card2 }, line: { color: COLOR.border, width: 1 },
+    });
+    iconBadge(s, ic.check, { x: MARGIN_X + 0.3, y: stripY + 0.15, d: 0.55, bg: COLOR.accentSoft });
+    s.addText(
+      [
+        { text: "Práticas seguidas: ", options: { bold: true, color: COLOR.text } },
+        {
+          text: "Spec-Driven Development (Spec-Kit) · decisões registradas com justificativa (estilo ADR) · "
+            + "revisão crítica contínua com achados reais datados · versionamento semântico via git.",
+          options: { color: COLOR.muted },
+        },
+      ],
+      {
+        x: MARGIN_X + 1.05, y: stripY + 0.06, w: CONTENT_W - 1.35, h: 0.73,
+        fontFace: FONT_BODY, fontSize: 11.5, margin: 0, valign: "middle",
+      }
+    );
+
+    footer(s, 12);
+  }
+
+  // =========================================================================
+  // SLIDE 13 — Avaliação crítica: custos
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -826,11 +912,11 @@ async function main() {
       fontFace: FONT_BODY, fontSize: 12.5, italic: true, color: COLOR.muted, margin: 0,
     });
 
-    footer(s, 12);
+    footer(s, 13);
   }
 
   // =========================================================================
-  // SLIDE 13 — Vieses e limitações
+  // SLIDE 14 — Vieses e limitações
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -866,11 +952,11 @@ async function main() {
       }
     );
 
-    footer(s, 13);
+    footer(s, 14);
   }
 
   // =========================================================================
-  // SLIDE 14 — Evoluções futuras
+  // SLIDE 15 — Evoluções futuras
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -878,35 +964,36 @@ async function main() {
     title(s, "Evoluções priorizadas");
 
     const items = [
+      { ic: ic.brain, h: "Co-STORM", d: "Melhora coleta e síntese — agentes colaborativos" },
       { ic: ic.certificate, h: "Patentes dedicadas", d: "API EPO OPS — cobertura mundial" },
       { ic: ic.lock, h: "Multiusuário", d: "Easy Auth / Entra ID" },
       { ic: ic.clock, h: "Monitoramento contínuo", d: "Azure Functions com timer" },
       { ic: ic.chartline, h: "Observabilidade de custo", d: "Application Insights por consulta" },
     ];
-    const gap = 0.4;
-    const cardW = (CONTENT_W - gap * 3) / 4, cardH = 2.3, y = 3.3;
+    const gap = 0.3;
+    const cardW = (CONTENT_W - gap * 4) / 5, cardH = 2.3, y = 3.3;
     items.forEach((it, i) => {
       const x = MARGIN_X + i * (cardW + gap);
       s.addShape(pptxgenPres.shapes.RECTANGLE, {
         x, y, w: cardW, h: cardH, fill: { color: COLOR.card }, line: { color: COLOR.border, width: 1 },
         shadow: makeShadow(0.25),
       });
-      iconBadge(s, it.ic, { x: x + cardW / 2 - 0.3, y: y + 0.25, d: 0.55, bg: COLOR.accentSoft });
+      iconBadge(s, it.ic, { x: x + cardW / 2 - 0.25, y: y + 0.25, d: 0.5, bg: COLOR.accentSoft });
       s.addText(it.h, {
-        x: x + 0.15, y: y + 0.98, w: cardW - 0.3, h: 0.42,
-        fontFace: FONT_BODY, fontSize: 13.5, bold: true, color: COLOR.text, align: "center", margin: 0, valign: "top",
+        x: x + 0.1, y: y + 0.98, w: cardW - 0.2, h: 0.5,
+        fontFace: FONT_BODY, fontSize: 12, bold: true, color: COLOR.text, align: "center", margin: 0, valign: "top",
       });
       s.addText(it.d, {
-        x: x + 0.15, y: y + 1.42, w: cardW - 0.3, h: cardH - 1.42 - 0.15,
-        fontFace: FONT_BODY, fontSize: 11, color: COLOR.muted, align: "center", margin: 0, valign: "middle",
+        x: x + 0.1, y: y + 1.5, w: cardW - 0.2, h: cardH - 1.5 - 0.1,
+        fontFace: FONT_BODY, fontSize: 9.5, color: COLOR.muted, align: "center", margin: 0, valign: "middle",
       });
     });
 
-    footer(s, 14);
+    footer(s, 15);
   }
 
   // =========================================================================
-  // SLIDE 15 — Fechamento
+  // SLIDE 16 — Fechamento
   // =========================================================================
   {
     const s = baseSlide(pres);
