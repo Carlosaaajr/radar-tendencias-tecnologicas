@@ -13,6 +13,7 @@ from typing import Literal
 from radar.agents.collector_agent import run_market_collection
 from radar.agents.scope_guard import ScopeCheckError, is_in_scope
 from radar.agents.synthesizer_agent import synthesize
+from radar.agents.theme_translator import TranslationError, translate_theme_to_english
 from radar.collectors.arxiv import ArxivCollector
 from radar.collectors.openalex import OpenAlexCollector
 from radar.config import get_settings
@@ -23,6 +24,7 @@ from radar.synthesis.grading import grade_report
 
 MIN_EVIDENCE_FOR_CONFIDENT_REPORT = 5
 SCOPE_CHECK_TIMEOUT_S = 15
+TRANSLATE_TIMEOUT_S = 15
 
 
 class RateLimitExceeded(Exception):
@@ -96,9 +98,17 @@ async def run_analysis(
 
     async def collect_academic() -> list:
         emit("academic", "Consultando arXiv e OpenAlex...")
+        try:
+            academic_theme = await asyncio.wait_for(
+                translate_theme_to_english(theme), timeout=TRANSLATE_TIMEOUT_S
+            )
+        except (TimeoutError, TranslationError):
+            # Falha na tradução nunca bloqueia a coleta (Princípio IV) — fail-open:
+            # segue com o tema original em português.
+            academic_theme = theme
         results = await asyncio.gather(
-            ArxivCollector().collect(theme),
-            OpenAlexCollector().collect(theme),
+            ArxivCollector().collect(academic_theme),
+            OpenAlexCollector().collect(academic_theme),
             return_exceptions=True,
         )
         evidence = []

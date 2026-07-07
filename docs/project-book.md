@@ -326,8 +326,10 @@ para mostrar fronteiras conscientes do sistema, não descobertas de surpresa):
 7. Inferência de ano de publicação pelo Agente Coletor quando a página não expõe
    metadata estruturada (aumenta a cobertura do gráfico "Publicações por ano").
 8. Agente de IA para refinamento semântico de query dos coletores acadêmicos —
-   complementa a heurística determinística atual (`industrial_scope.py`) com nuance
-   de domínio que uma lista fixa de termos não alcança.
+   **parcialmente implementado**: tradução do tema para inglês (`theme_translator.py`)
+   já em produção, resolvendo a fatia dominante do ruído cross-idioma. Em aberto:
+   expansão com sinônimos e termos técnicos específicos do setor, além de tradução
+   literal.
 
 ## 12. Glossário
 

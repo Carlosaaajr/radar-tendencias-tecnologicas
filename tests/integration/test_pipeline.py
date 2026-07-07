@@ -62,6 +62,15 @@ def default_in_scope(monkeypatch):
     monkeypatch.setattr("radar.orchestrator.is_in_scope", AsyncMock(return_value=True))
 
 
+@pytest.fixture(autouse=True)
+def default_translate(monkeypatch):
+    """Por padrão a tradução é identidade nos testes — evita chamada real ao Foundry."""
+    monkeypatch.setattr(
+        "radar.orchestrator.translate_theme_to_english",
+        AsyncMock(side_effect=lambda theme, **kwargs: theme),
+    )
+
+
 def _patch_synthesize(raw: dict = VALID_SYNTHESIS_RAW):
     from radar.agents.synthesizer_agent import parse_synthesis_output
 
@@ -114,6 +123,68 @@ async def test_one_source_degraded_still_completes():
 
     assert report.status == ReportStatus.COMPLETED
     assert "arXiv" in report.degraded_sources
+
+
+@pytest.mark.asyncio
+async def test_academic_collectors_receive_translated_theme():
+    """arXiv/OpenAlex devem receber o tema traduzido, nunca o Report.theme original
+    (achado real: bases predominantemente em inglês, tema em português causa matches
+    espúrios — ver docs/critical-review.md)."""
+    market = CollectorResult(evidence=[_ev("ev-201", SourceType.MARKET)])
+
+    with (
+        patch("radar.orchestrator.ArxivCollector") as MockArxiv,
+        patch("radar.orchestrator.OpenAlexCollector") as MockOpenAlex,
+        patch("radar.orchestrator.run_market_collection", new=AsyncMock(return_value=market)),
+        patch(
+            "radar.orchestrator.translate_theme_to_english",
+            new=AsyncMock(return_value="AI-Assisted Industrial Maintenance"),
+        ),
+        _patch_synthesize(),
+    ):
+        MockArxiv.return_value.collect = AsyncMock(
+            return_value=CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC)])
+        )
+        MockOpenAlex.return_value.collect = AsyncMock(return_value=CollectorResult(evidence=[]))
+
+        await run_analysis("Manutenção Assistida por IA")
+
+        arxiv_call_arg = MockArxiv.return_value.collect.call_args[0][0]
+        openalex_call_arg = MockOpenAlex.return_value.collect.call_args[0][0]
+
+    assert arxiv_call_arg == "AI-Assisted Industrial Maintenance"
+    assert openalex_call_arg == "AI-Assisted Industrial Maintenance"
+
+
+@pytest.mark.asyncio
+async def test_academic_collectors_fall_back_to_original_theme_on_translation_failure():
+    """Fail-open (Princípio IV): falha na tradução nunca bloqueia a coleta acadêmica —
+    os coletores recebem o tema original em português."""
+    from radar.agents.theme_translator import TranslationError
+
+    market = CollectorResult(evidence=[_ev("ev-201", SourceType.MARKET)])
+
+    with (
+        patch("radar.orchestrator.ArxivCollector") as MockArxiv,
+        patch("radar.orchestrator.OpenAlexCollector") as MockOpenAlex,
+        patch("radar.orchestrator.run_market_collection", new=AsyncMock(return_value=market)),
+        patch(
+            "radar.orchestrator.translate_theme_to_english",
+            new=AsyncMock(side_effect=TranslationError("falha de rede")),
+        ),
+        _patch_synthesize(),
+    ):
+        MockArxiv.return_value.collect = AsyncMock(
+            return_value=CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC)])
+        )
+        MockOpenAlex.return_value.collect = AsyncMock(return_value=CollectorResult(evidence=[]))
+
+        report = await run_analysis("Manutenção Assistida por IA")
+
+        arxiv_call_arg = MockArxiv.return_value.collect.call_args[0][0]
+
+    assert arxiv_call_arg == "Manutenção Assistida por IA"
+    assert report.status == ReportStatus.COMPLETED
 
 
 @pytest.mark.asyncio

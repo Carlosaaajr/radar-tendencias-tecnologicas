@@ -219,6 +219,41 @@ qualificação (inofensivo, mas redundante). A qualificação booleana em si é 
 resolve o caso comum (tema genérico sem contexto), mas não infere nuance de domínio como um
 agente de IA faria. Ver evolução futura correspondente abaixo.
 
+## Correção do achado acima — a mitigação booleana não bastava; causa raiz era o idioma (2026-07-07)
+
+Ao investigar uma reclamação real do usuário ("Manutenção Assistida por IA" trazendo muitas
+referências fora de contexto na aba Evidências, mesmo já com a mitigação acima em produção),
+teste ao vivo contra as APIs reais revelou que a afirmação anterior — "suportado nativamente...
+que documenta operadores booleanos" — estava **incorreta**: o parâmetro `search` do OpenAlex
+não aplica `AND`/`OR`/aspas como filtro booleano estrito; é busca por relevância que trata essas
+palavras como termos fracos. Consulta de teste direta (`... AND ("industrial" OR "manufacturing"
+OR "industry 4.0")`) devolveu 108 resultados do OpenAlex, incluindo títulos sem nenhuma das três
+palavras (ex.: "IA Desplugada para a Educação"). arXiv tem o mesmo problema em menor grau.
+
+**Causa raiz real, mais profunda**: o tema é digitado em português e enviado literalmente a bases
+predominantemente em inglês. Palavras curtas e comuns do português ("por", "IA") batem por
+substring/stem contra títulos completamente não relacionados — ex.: arXiv devolveu "**PoR** for
+Security Protocol Equivalences" e "PZT-film/**Por**-Si/Si" só porque "por"/"POR" aparece no
+título. Em uma amostra real de 56 evidências para esse tema, ~70% das 20 evidências científicas
+(arXiv+OpenAlex) e ~87% das 8 evidências da perspectiva "regulatory" do Agente Coletor eram
+claramente fora de contexto (saúde, direito, educação, materiais, criptografia).
+
+**Correção implementada**: `src/radar/agents/theme_translator.py` — uma chamada curta e barata ao
+Foundry (mesmo padrão do `scope_guard.py`) traduz o tema para inglês antes de consultar
+arXiv/OpenAlex (se já estiver em inglês, retorna inalterado). Fail-open: falha na tradução usa o
+tema original (`Report.theme` nunca é alterado — é só a query de busca acadêmica). A qualificação
+industrial booleana (achado anterior) continua aplicada sobre o tema já traduzido.
+
+**Validado ao vivo**: para "Manutenção Assistida por IA" → traduzido para "AI-Assisted
+Maintenance", os 10 primeiros resultados de arXiv e os 10 primeiros do OpenAlex ficaram **100%
+on-topic** (Industry 4.0, manutenção preditiva, IA industrial, smart manufacturing) — nenhum dos
+falsos positivos anteriores reapareceu.
+
+**Limitação residual**: a perspectiva "regulatory" do Agente Coletor (Web Search) ainda não foi
+corrigida — seu prompt pede "regulatory developments... including patent activity" de forma
+genérica, o que também traz ruído (patentes/regulação de IA em geral, não específica de
+manutenção). Registrado como achado separado, correção pendente de decisão do usuário.
+
 ## Vieses conhecidos
 
 - **De fonte**: consultorias pagas (Gartner/McKinsey) entram só pelo material público —
@@ -322,13 +357,13 @@ prazo — registrados como limitação/evolução):
    metadata estruturada, para aumentar a cobertura do gráfico "Publicações por ano"
    (hoje só 24% das evidências têm data em temas com forte presença de notícia/mercado
    — achado real de 2026-07-07, ver Limitações conhecidas).
-9. **Agente de IA para refinamento semântico de query dos coletores acadêmicos**: a
-   mitigação atual do achado "coletores sem recorte de aplicação industrial" (acima) é
-   uma heurística determinística (lista fixa de termos-gatilho PT/EN). Uma evolução
-   natural é substituir/complementar essa heurística por uma chamada curta e barata ao
-   Foundry (mesmo padrão do `scope_guard.py`, R11) que reescreva a query com nuance
-   semântica de domínio antes de consultar arXiv/OpenAlex — capturando sinônimos,
-   termos técnicos específicos do setor e idiomas fora da lista fixa, que a heurística
-   atual não alcança. Mantém os coletores em si determinísticos (chamada HTTP direta);
-   o agente de IA atuaria só na etapa de formulação da query, não na graduação do
-   suporte (Princípio I permanece intacto). Não implementado nesta fase.
+9. **Agente de IA para refinamento semântico de query dos coletores acadêmicos** —
+   **parcialmente implementado em 2026-07-07**: a tradução do tema para inglês
+   (`theme_translator.py`, ver correção do achado acima) já cobre a fatia mais crítica
+   deste item (o tema chegava a arXiv/OpenAlex em português, causando ruído
+   cross-idioma). Ainda em aberto, não implementado: reescrita com sinônimos e termos
+   técnicos específicos do setor (ex.: expandir "manutenção" para incluir "asset
+   management", "condition monitoring" quando pertinente) — vai além de tradução
+   literal e exigiria um prompt mais elaborado que o de tradução simples. Mantém os
+   coletores em si determinísticos (chamada HTTP direta); o agente de IA atua só na
+   etapa de formulação da query, não na graduação do suporte (Princípio I intacto).
