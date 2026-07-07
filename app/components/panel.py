@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import streamlit as st
+from components.charts import render_overview_charts
 
 from radar.models import Report, ReportStatus, SupportLevel
 
@@ -41,6 +42,10 @@ def render_report(report: Report) -> None:
         )
     for warning in report.warnings:
         st.warning(warning)
+
+    if report.evidence:
+        with st.container(border=True):
+            render_overview_charts(report.evidence, report.sections)
 
     evidence_by_id = {ev.id: ev for ev in report.evidence}
 
