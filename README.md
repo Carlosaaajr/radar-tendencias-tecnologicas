@@ -2,7 +2,7 @@
 
 Plataforma que recebe um tema tecnológico (ex.: "Edge AI", "Robôs Humanoides para
 Indústria") e gera um painel executivo estruturado, fundamentado em evidências
-verificáveis coletadas na internet — desenvolvida para o desafio **SENAI do Futuro — IA**.
+verificáveis coletadas na internet — desenvolvida para o desafio **SENAI Futuro — IA**.
 
 ## Arquitetura em 1 parágrafo
 
@@ -76,6 +76,6 @@ durante o desenvolvimento.
 
 ## Contexto do desafio
 
-Este projeto foi desenvolvido para o desafio **SENAI do Futuro — IA** (Radar de
+Este projeto foi desenvolvido para o desafio **SENAI Futuro — IA** (Radar de
 Tendências Tecnológicas). A especificação completa do problema de negócio está em
 [`specs/001-radar-tendencias/spec.md`](specs/001-radar-tendencias/spec.md).

@@ -111,7 +111,7 @@ function title(slide, text, opts = {}) {
 }
 
 function footer(slide, pageNum) {
-  slide.addText("RADAR DE TENDÊNCIAS TECNOLÓGICAS  ·  SENAI DO FUTURO — IA", {
+  slide.addText("RADAR DE TENDÊNCIAS TECNOLÓGICAS  ·  SENAI FUTURO — IA", {
     x: MARGIN_X, y: PAGE_H - 0.42, w: 8, h: 0.3,
     fontFace: FONT_BODY, fontSize: 9, color: COLOR.muted, charSpacing: 1, margin: 0,
   });
@@ -206,7 +206,7 @@ async function main() {
 
     iconBadge(s, ic.satellite, { x: MARGIN_X, y: 1.5, d: 1.0, bg: COLOR.accentSoft, iconScale: 0.55 });
 
-    s.addText("SENAI DO FUTURO — DESAFIO IA", {
+    s.addText("SENAI FUTURO — DESAFIO IA", {
       x: MARGIN_X, y: 2.75, w: 10, h: 0.4,
       fontFace: FONT_HEAD, fontSize: 14, bold: true, color: COLOR.accent, charSpacing: 4, margin: 0,
     });
@@ -467,7 +467,50 @@ async function main() {
   }
 
   // =========================================================================
-  // SLIDE 6 — Diferencial: evidência rastreável por design
+  // SLIDE 6 — Arquitetura da solução (diagrama completo)
+  // =========================================================================
+  {
+    const s = baseSlide(pres);
+    kicker(s, "Arquitetura");
+    title(s, "O diagrama completo, de ponta a ponta");
+
+    s.addText("Guardrail de escopo, coleta em paralelo, síntese e persistência — cada bloco mapeado para um serviço Azure real.", {
+      x: MARGIN_X, y: 1.5, w: CONTENT_W, h: 0.35,
+      fontFace: FONT_BODY, fontSize: 12, italic: true, color: COLOR.muted, margin: 0,
+    });
+
+    const highlights = [
+      { ic: ic.cloud, h: "Colocalizado em Brazil South", d: "App Service + Cosmos DB + Foundry na mesma região — zero latência cross-region." },
+      { ic: ic.shield, h: "Guardrail antes do pipeline", d: "O Foundry classifica o tema antes de qualquer chamada cara (fail-open em caso de erro)." },
+      { ic: ic.projectDiagram, h: "Camadas isoladas e testáveis", d: "Coleta, síntese e persistência são módulos independentes, cada um com sua própria suíte de testes." },
+    ];
+    const leftX = MARGIN_X, leftW = 3.5;
+    let hy = 2.3;
+    highlights.forEach((it) => {
+      iconRow(s, it.ic, it.h, it.d, { x: leftX, y: hy, w: leftW });
+      hy += 1.45;
+    });
+
+    // Framed diagram image (white card, matches the light background of the exported PNG)
+    const imgH = 4.6, imgW = imgH * (2625 / 1905);
+    const zoneX = leftX + leftW + 0.4, zoneW = PAGE_W - MARGIN_X - zoneX;
+    const imgX = zoneX + (zoneW - imgW) / 2, imgY = 2.15;
+    const pad = 0.12;
+    s.addShape(pptxgenPres.shapes.RECTANGLE, {
+      x: imgX - pad, y: imgY - pad, w: imgW + pad * 2, h: imgH + pad * 2,
+      fill: { color: "FFFFFF" }, line: { color: COLOR.border, width: 1 },
+      shadow: makeShadow(0.35),
+    });
+    s.addImage({
+      path: require("path").join(__dirname, "criterios", "01-arquitetura.drawio.png"),
+      x: imgX, y: imgY, w: imgW, h: imgH,
+    });
+
+    footer(s, 6);
+  }
+
+  // =========================================================================
+  // SLIDE 7 — Diferencial: evidência rastreável por design
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -523,11 +566,11 @@ async function main() {
       }
     );
 
-    footer(s, 6);
+    footer(s, 7);
   }
 
   // =========================================================================
-  // SLIDE 7 — Coleta multi-perspectiva + fontes
+  // SLIDE 8 — Coleta multi-perspectiva + fontes
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -601,11 +644,11 @@ async function main() {
       }
     );
 
-    footer(s, 7);
+    footer(s, 8);
   }
 
   // =========================================================================
-  // SLIDE 8 — Demo
+  // SLIDE 9 — Demo
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -632,11 +675,11 @@ async function main() {
       });
     });
 
-    footer(s, 8);
+    footer(s, 9);
   }
 
   // =========================================================================
-  // SLIDE 9 — Resultados reais
+  // SLIDE 10 — Resultados reais
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -687,11 +730,11 @@ async function main() {
       s.addText("SC-005 (≥3 tipos)", { x: x + 0.8 + (cardW - 1.1) / 2 + 0.5, y: y + 3.5, w: (cardW - 1.1) / 2, h: 0.4, fontFace: FONT_BODY, fontSize: 11.5, color: COLOR.text, valign: "middle", margin: 0 });
     });
 
-    footer(s, 9);
+    footer(s, 10);
   }
 
   // =========================================================================
-  // SLIDE 10 — Resiliência testada em produção
+  // SLIDE 11 — Resiliência testada em produção
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -734,11 +777,11 @@ async function main() {
       }
     );
 
-    footer(s, 10);
+    footer(s, 11);
   }
 
   // =========================================================================
-  // SLIDE 11 — Avaliação crítica: custos
+  // SLIDE 12 — Avaliação crítica: custos
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -783,11 +826,11 @@ async function main() {
       fontFace: FONT_BODY, fontSize: 12.5, italic: true, color: COLOR.muted, margin: 0,
     });
 
-    footer(s, 11);
+    footer(s, 12);
   }
 
   // =========================================================================
-  // SLIDE 12 — Vieses e limitações
+  // SLIDE 13 — Vieses e limitações
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -823,11 +866,11 @@ async function main() {
       }
     );
 
-    footer(s, 12);
+    footer(s, 13);
   }
 
   // =========================================================================
-  // SLIDE 13 — Evoluções futuras
+  // SLIDE 14 — Evoluções futuras
   // =========================================================================
   {
     const s = baseSlide(pres);
@@ -859,11 +902,11 @@ async function main() {
       });
     });
 
-    footer(s, 13);
+    footer(s, 14);
   }
 
   // =========================================================================
-  // SLIDE 14 — Fechamento
+  // SLIDE 15 — Fechamento
   // =========================================================================
   {
     const s = baseSlide(pres);

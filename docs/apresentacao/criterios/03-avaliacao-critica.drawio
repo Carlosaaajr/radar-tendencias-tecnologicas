@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio">
+  <diagram name="AvaliacaoCritica">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Avaliação Crítica — riscos · custos · vieses · evoluções futuras" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="10" width="1280" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="q1" value="Riscos" style="swimlane;startSize=34;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=15;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="70" width="630" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="q1body" value="• Análise síncrona in-process — não sobrevive a restart do App Service&#xa;&#xa;• Deployment gpt-5-radar com capacidade reservada baixa — pode gargalar sob uso concorrente real&#xa;&#xa;• SC-001 (≤5 min) é apertado contra a latência de 4 buscas web concorrentes&#xa;&#xa;• Tema do usuário sem sanitização no prompt — risco de prompt injection (mitigado: grau de suporte é determinístico em código, não autoavaliação do LLM)&#xa;&#xa;• Sem autenticação — controle de acesso apenas por IP allowlist" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="120" width="570" height="370" as="geometry" />
+        </mxCell>
+
+        <mxCell id="q2" value="Custos" style="swimlane;startSize=34;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=15;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="710" y="70" width="630" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="q2body" value="• Fixo: ~US$14-15/mês (App Service B1 + Cosmos DB serverless)&#xa;&#xa;• Por análise: ~US$0,20-0,50 (tokens Foundry + Web Search tool) — a confirmar com métricas reais de produção&#xa;&#xa;• Cenário 100 análises/mês: ~US$30-60/mês estimado&#xa;&#xa;• Freios de abuso: limite diário de 10 análises, budget alert de US$30/mês, Access Restrictions por IP, TPM baixo no deployment" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="740" y="120" width="570" height="370" as="geometry" />
+        </mxCell>
+
+        <mxCell id="q3" value="Vieses" style="swimlane;startSize=34;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="530" width="630" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="q3body" value="• De fonte: consultorias pagas (Gartner/McKinsey) entram só via material público; arXiv enviesa para CS/física (mitigado por OpenAlex, multidisciplinar)&#xa;&#xa;• De idioma: corpus predominantemente em inglês; sinais de mercado brasileiro sub-representados&#xa;&#xa;• De modelo: o Sintetizador pode privilegiar narrativas dominantes no treinamento — mitigado: grau de suporte é função determinística em código, nunca autoavaliação do LLM&#xa;&#xa;• De recorte do buscador: o ranking do provedor por trás do Web Search tool decide o que o Coletor vê" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="580" width="570" height="370" as="geometry" />
+        </mxCell>
+
+        <mxCell id="q4" value="Evoluções Futuras" style="swimlane;startSize=34;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="710" y="530" width="630" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="q4body" value="• Co-STORM (Jiang et al., EMNLP 2024, Stanford OVAL) — exploração guiada colaborativa com participação do usuário&#xa;&#xa;• API dedicada de patentes (EPO OPS — cobertura mundial incl. BR, conta gratuita)&#xa;&#xa;• Easy Auth/Entra ID + multiusuário; Key Vault + RBAC data plane no Cosmos&#xa;&#xa;• Monitoramento contínuo agendado (Azure Functions timer) com diff entre execuções&#xa;&#xa;• Observabilidade de custo por consulta (Application Insights + metrics do Report)" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="740" y="580" width="570" height="370" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

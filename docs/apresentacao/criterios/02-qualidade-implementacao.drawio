@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio">
+  <diagram name="Qualidade">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="zoneLayers" value="Organização em camadas — src/radar/" style="swimlane;startSize=30;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="620" height="860" as="geometry" />
+        </mxCell>
+        <mxCell id="zoneQuality" value="Garantia de qualidade" style="swimlane;startSize=30;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="720" y="60" width="640" height="860" as="geometry" />
+        </mxCell>
+
+        <!-- Layers -->
+        <mxCell id="l1" value="app/ — UI Streamlit&#xa;Home.py, pages/ (Histórico, Evidências)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" value="orchestrator.py&#xa;run_analysis() — pipeline central + guardrail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="230" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l3" value="agents/ — collector_agent.py, synth_agent.py, scope_guard.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="340" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l4" value="collectors/ — arxiv.py, openalex.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="450" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l5" value="synthesis/ — dedup.py, grading.py, parsing.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="560" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l6" value="storage/ — cosmos_repository.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="670" width="540" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="l7" value="tests/ — unit + integration + fixtures (espelha cada módulo acima, tudo mockado)" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="80" y="790" width="540" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="le1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="l1" target="l2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="le2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="l2" target="l3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="le3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="l3" target="l4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="le4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="l4" target="l5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="le5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="l5" target="l6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Testing pyramid -->
+        <mxCell id="pyrTitle" value="Pirâmide de testes — 50 testes automatizados" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="110" width="560" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pyr3" value="Live smoke test (real) — pytest -m live&#xa;Foundry + Cosmos de produção" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="150" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pyr2" value="Integration tests (mockados)&#xa;orquestrador fim-a-fim: feliz · degradado · timeout · fora de escopo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="840" y="220" width="400" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pyr1" value="Unit tests (mockados) — dedup · grading · parsing · coletores · scope_guard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="290" width="560" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Spec-kit gates -->
+        <mxCell id="gTitle" value="Portões de qualidade — fluxo spec-kit" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="380" width="560" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="g1" value="Constituição" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="g2" value="Spec" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="880" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="g3" value="Plan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="g4" value="Tasks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="g5" value="Implement" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ge1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="g1" target="g2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ge2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="g2" target="g3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ge3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="g3" target="g4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ge4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="g4" target="g5"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="review" value="Code review obrigatório (octo-code-reviewer)&#xa;3 achados ALTO corrigidos antes da apresentação" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="510" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ge5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=1;entryY=0.3;" edge="1" parent="1" source="g5" target="review"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="prod" value="Produção&#xa;App Service + smoke test real (T036)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="620" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ge6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="review" target="prod"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="bugsnote" value="6 bugs reais só apareceram em teste contra produção real (nunca em mocks) — corrigidos com testes de regressão.&#xa;Ex.: arXiv HTTP→HTTPS, capacidade insuficiente do deployment, RateLimitError não tratado na síntese." style="rounded=1;dashed=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="760" y="710" width="560" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

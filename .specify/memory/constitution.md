@@ -21,7 +21,7 @@ Sync Impact Report
 
 Plataforma que recebe um tema tecnológico (tendência, tecnologia ou conceito) e gera um
 painel executivo fundamentado em evidências verificáveis coletadas na internet, conforme o
-desafio "SENAI do Futuro — IA". Projeto: `research-hub`.
+desafio "SENAI Futuro — IA". Projeto: `research-hub`.
 
 ## Core Principles
 

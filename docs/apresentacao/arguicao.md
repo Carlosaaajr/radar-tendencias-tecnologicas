@@ -1,6 +1,6 @@
 # Guia de Arguição — Radar de Tendências Tecnológicas
 
-> Material de apoio para os 10 minutos de arguição da banca (SENAI do Futuro — IA).
+> Material de apoio para os 10 minutos de arguição da banca (SENAI Futuro — IA).
 > Organizado pelos 5 critérios de avaliação do desafio. Respostas curtas e diretas —
 > use como cola mental, não leia ao vivo.
 
