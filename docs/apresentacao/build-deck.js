@@ -968,7 +968,7 @@ async function main() {
       { ic: ic.certificate, h: "Patentes dedicadas", d: "API EPO OPS — cobertura mundial" },
       { ic: ic.lock, h: "Multiusuário", d: "Easy Auth / Entra ID" },
       { ic: ic.clock, h: "Monitoramento contínuo", d: "Azure Functions com timer" },
-      { ic: ic.chartline, h: "Observabilidade de custo", d: "Application Insights por consulta" },
+      { ic: ic.shield, h: "Harness de Agentes", d: "Guardrails, segurança, auditoria e observabilidade" },
     ];
     const gap = 0.3;
     const cardW = (CONTENT_W - gap * 4) / 5, cardH = 2.3, y = 3.3;
