@@ -1,0 +1,5692 @@
+{
+ "version": "1.0.0",
+ "project": {
+  "name": "radar-tendencias",
+  "languages": [
+   "python",
+   "markdown",
+   "javascript",
+   "toml",
+   "json",
+   "yaml",
+   "xml",
+   "drawio",
+   "pptx"
+  ],
+  "frameworks": [
+   "Pydantic",
+   "Streamlit",
+   "pytest"
+  ],
+  "description": "Radar de Tendências Tecnológicas é uma plataforma que recebe um tema tecnológico e gera um painel executivo estruturado, fundamentado em evidências verificáveis coletadas na internet.",
+  "analyzedAt": "2026-07-07T13:29:55.598538Z",
+  "gitCommitHash": "01984a6b5a5bfe1855ee87d4a24eb26e1837b076"
+ },
+ "nodes": [
+  {
+   "id": "file:app/Home.py",
+   "type": "file",
+   "name": "Home.py",
+   "filePath": "app/Home.py",
+   "summary": "Página inicial do Streamlit: recebe o tema de interesse do usuário, dispara o pipeline de análise (coleta + síntese), trata reaproveitamento de relatórios existentes e renderiza o painel executivo resultante.",
+   "tags": [
+    "entry-point",
+    "streamlit-page",
+    "orchestration",
+    "ui"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Insere 'src/' no sys.path manualmente para permitir importar o pacote 'radar' fora de um projeto instalável, padrão comum em apps Streamlit multi-página."
+  },
+  {
+   "id": "file:app/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "app/__init__.py",
+   "summary": "Arquivo vazio que marca 'app' como pacote Python; não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:app/components/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "app/components/__init__.py",
+   "summary": "Arquivo vazio que marca 'app/components' como pacote Python; não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:app/components/charts.py",
+   "type": "file",
+   "name": "charts.py",
+   "filePath": "app/components/charts.py",
+   "summary": "Biblioteca de gráficos Plotly do painel executivo (mix de tipo de fonte, distribuição de perspectivas, radar de maturidade, top origens, linha do tempo e mix de linguagem), com paleta categórica fixa para manter cores consistentes entre relatórios.",
+   "tags": [
+    "component",
+    "data-visualization",
+    "utility",
+    "streamlit-page"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Cores são atribuídas por identidade de categoria (não por posição/ranking), garantindo que o mesmo tipo de fonte sempre apareça com a mesma cor."
+  },
+  {
+   "id": "file:app/components/panel.py",
+   "type": "file",
+   "name": "panel.py",
+   "filePath": "app/components/panel.py",
+   "summary": "Renderiza o painel executivo completo (10 seções + badges de nível de suporte) a partir de um objeto Report, delegando os gráficos de visão geral para charts.py.",
+   "tags": [
+    "component",
+    "api-handler",
+    "ui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:app/components/progress.py",
+   "type": "file",
+   "name": "progress.py",
+   "filePath": "app/components/progress.py",
+   "summary": "Componente de UI que exibe o progresso em tempo real do pipeline de análise dentro do Streamlit, atualizando um placeholder a cada evento recebido do orquestrador.",
+   "tags": [
+    "component",
+    "event-handler",
+    "ui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:app/pages/1_Historico.py",
+   "type": "file",
+   "name": "1_Historico.py",
+   "filePath": "app/pages/1_Historico.py",
+   "summary": "Página Streamlit de histórico: lista os relatórios já gerados com status e permite reabri-los instantaneamente sem nova coleta de evidências.",
+   "tags": [
+    "streamlit-page",
+    "ui",
+    "history"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:app/pages/2_Evidencias.py",
+   "type": "file",
+   "name": "2_Evidencias.py",
+   "filePath": "app/pages/2_Evidencias.py",
+   "summary": "Página Streamlit de exploração de evidências: permite filtrar as evidências do relatório ativo por tipo de fonte e destaca seções com divergência entre fontes.",
+   "tags": [
+    "streamlit-page",
+    "ui",
+    "filtering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:app/pages/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "app/pages/__init__.py",
+   "summary": "Arquivo vazio que marca 'app/pages' como pacote Python; não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:data/reports/.gitkeep",
+   "type": "file",
+   "name": ".gitkeep",
+   "filePath": "data/reports/.gitkeep",
+   "summary": "Arquivo vazio usado para garantir que o diretório 'data/reports/' (destino da exportação offline de relatórios) seja versionado no Git mesmo quando vazio.",
+   "tags": [
+    "placeholder",
+    "git-tracking",
+    "empty-directory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:docs/apresentacao/build-deck.js",
+   "type": "file",
+   "name": "build-deck.js",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "summary": "Script Node.js (PptxGenJS + React-icons + sharp) que gera programaticamente o slide deck da apresentação do Radar de Tendências para a banca, incluindo motivo visual de radar, badges de ícones, cartões de arquitetura e slides de resultados.",
+   "tags": [
+    "script",
+    "build-system",
+    "presentation",
+    "code-generation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Renderiza ícones React para SVG e depois para PNG via sharp antes de embuti-los no PPTX, evitando dependência de fontes de ícone no PowerPoint."
+  },
+  {
+   "id": "file:docs/apresentacao/criterios/01-arquitetura.drawio",
+   "type": "file",
+   "name": "01-arquitetura.drawio",
+   "filePath": "docs/apresentacao/criterios/01-arquitetura.drawio",
+   "summary": "Diagrama draw.io da arquitetura de implantação do sistema, mostrando as zonas Azure App Service (Linux B1), Azure AI Foundry Agents e fontes públicas externas usadas na apresentação para a banca.",
+   "tags": [
+    "diagram",
+    "architecture",
+    "presentation",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:docs/apresentacao/criterios/02-qualidade-implementacao.drawio",
+   "type": "file",
+   "name": "02-qualidade-implementacao.drawio",
+   "filePath": "docs/apresentacao/criterios/02-qualidade-implementacao.drawio",
+   "summary": "Diagrama draw.io que ilustra os critérios de qualidade de implementação do projeto (testes, práticas de engenharia, robustez) usado como material de apoio na apresentação para a banca.",
+   "tags": [
+    "diagram",
+    "quality",
+    "presentation",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:docs/apresentacao/criterios/03-avaliacao-critica.drawio",
+   "type": "file",
+   "name": "03-avaliacao-critica.drawio",
+   "filePath": "docs/apresentacao/criterios/03-avaliacao-critica.drawio",
+   "summary": "Diagrama draw.io menor que resume a avaliação crítica do projeto (limitações e trade-offs) usado como material de apoio na apresentação para a banca.",
+   "tags": [
+    "diagram",
+    "evaluation",
+    "presentation",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:docs/apresentacao/radar-tendencias-apresentacao.pptx",
+   "type": "file",
+   "name": "radar-tendencias-apresentacao.pptx",
+   "filePath": "docs/apresentacao/radar-tendencias-apresentacao.pptx",
+   "summary": "Apresentação PowerPoint final gerada por build-deck.js para a defesa do projeto perante a banca, cobrindo motivação, arquitetura, pipeline, resultados e avaliação crítica do Radar de Tendências Tecnológicas.",
+   "tags": [
+    "presentation",
+    "deliverable",
+    "documentation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:infra/export_reports.py",
+   "type": "file",
+   "name": "export_reports.py",
+   "filePath": "infra/export_reports.py",
+   "summary": "Script de linha de comando que exporta relatórios completos/parciais do Cosmos DB de produção para arquivos locais em data/reports/, permitindo demonstração offline via RADAR_OFFLINE=1.",
+   "tags": [
+    "script",
+    "data-pipeline",
+    "database",
+    "cli"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:infra/gen_test_report.py",
+   "type": "file",
+   "name": "gen_test_report.py",
+   "filePath": "infra/gen_test_report.py",
+   "summary": "Script auxiliar (T036-relacionado) que executa uma coleta e síntese reais para um único tema e salva o relatório localmente, usado para testar novos gráficos do painel sem tocar o Cosmos de produção.",
+   "tags": [
+    "script",
+    "cli",
+    "testing",
+    "development"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:infra/smoke_test.py",
+   "type": "file",
+   "name": "smoke_test.py",
+   "filePath": "infra/smoke_test.py",
+   "summary": "Smoke test de produção (T036) que roda os dois temas do desafio contra o Azure AI Foundry e o Cosmos DB reais, mede duração e diversidade de fontes, e valida os critérios de sucesso SC-001 (≤5min) e SC-005 (≥3 tipos de fonte).",
+   "tags": [
+    "test",
+    "script",
+    "cli",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:infra/spike_web_search.py",
+   "type": "file",
+   "name": "spike_web_search.py",
+   "filePath": "infra/spike_web_search.py",
+   "summary": "Spike técnico (T006) que valida a ferramenta Web Search na API de agentes do Azure AI Foundry, medindo latência e inspecionando o formato das citações de URL retornadas.",
+   "tags": [
+    "script",
+    "spike",
+    "cli",
+    "azure"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/__init__.py",
+   "summary": "Arquivo vazio que marca 'src' como pacote Python; não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/radar/__init__.py",
+   "summary": "Arquivo vazio que marca 'src/radar' como pacote Python raiz da aplicação; não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/agents/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/radar/agents/__init__.py",
+   "summary": "Arquivo vazio que marca 'src/radar/agents' como subpacote Python (agentes Coletor/Sintetizador); não contém lógica.",
+   "tags": [
+    "package-init",
+    "empty-file",
+    "python-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/Home.py:_run_pipeline",
+   "type": "function",
+   "name": "_run_pipeline",
+   "filePath": "app/Home.py",
+   "lineRange": [
+    56,
+    71
+   ],
+   "summary": "Executa o pipeline de análise de forma assíncrona para o tema informado, atualizando o estado de sessão do Streamlit e tratando erros de escopo/limite de taxa com mensagens amigáveis.",
+   "tags": [
+    "orchestration",
+    "event-handler",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_base_layout",
+   "type": "function",
+   "name": "_base_layout",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    67,
+    76
+   ],
+   "summary": "Gera o dicionário de layout base do Plotly (fonte, cores de fundo e grade) compartilhado por todos os gráficos do painel, com possibilidade de sobrescrever campos específicos.",
+   "tags": [
+    "utility",
+    "data-visualization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:render_overview_charts",
+   "type": "function",
+   "name": "render_overview_charts",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    84,
+    108
+   ],
+   "summary": "Ponto de entrada público que organiza e renderiza todos os gráficos de visão geral do painel executivo (mix de fontes, perspectivas, maturidade, origens, linha do tempo e linguagem) em colunas do Streamlit.",
+   "tags": [
+    "data-visualization",
+    "component",
+    "api-handler"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_source_type_mix",
+   "type": "function",
+   "name": "_render_source_type_mix",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    111,
+    136
+   ],
+   "summary": "Renderiza um gráfico de pizza mostrando a proporção de evidências por tipo de fonte (científica, mercado, notícia, etc.), com tabela detalhada em um expander.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_perspective_distribution",
+   "type": "function",
+   "name": "_render_perspective_distribution",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    139,
+    178
+   ],
+   "summary": "Renderiza um gráfico de barras da distribuição de evidências por perspectiva multi-visão (estilo STORM) usada na coleta.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_maturity_radar",
+   "type": "function",
+   "name": "_render_maturity_radar",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    181,
+    231
+   ],
+   "summary": "Renderiza um gráfico de radar (scatterpolar) representando o nível de maturidade de cada seção do painel executivo, com tabela de apoio.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_top_origins",
+   "type": "function",
+   "name": "_render_top_origins",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    234,
+    272
+   ],
+   "summary": "Renderiza um gráfico de barras horizontais com as principais origens (domínios/fontes) das evidências coletadas, ordenadas por frequência.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_timeline",
+   "type": "function",
+   "name": "_render_timeline",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    275,
+    314
+   ],
+   "summary": "Renderiza uma linha do tempo (gráfico de dispersão) da quantidade de evidências publicadas por ano, quando há dados suficientes para ser informativo.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/charts.py:_render_language_mix",
+   "type": "function",
+   "name": "_render_language_mix",
+   "filePath": "app/components/charts.py",
+   "lineRange": [
+    317,
+    352
+   ],
+   "summary": "Renderiza um gráfico de pizza com a distribuição de idiomas das evidências coletadas, agrupando idiomas com poucas ocorrências.",
+   "tags": [
+    "data-visualization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:app/components/panel.py:render_report",
+   "type": "function",
+   "name": "render_report",
+   "filePath": "app/components/panel.py",
+   "lineRange": [
+    31,
+    78
+   ],
+   "summary": "Renderiza o painel executivo completo de um relatório: avisos de status parcial, gráficos de visão geral, as 10 seções textuais com badges de nível de suporte e a lista de evidências citadas.",
+   "tags": [
+    "api-handler",
+    "component",
+    "ui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:app/components/progress.py:ProgressTracker",
+   "type": "class",
+   "name": "ProgressTracker",
+   "filePath": "app/components/progress.py",
+   "lineRange": [
+    20,
+    40
+   ],
+   "summary": "Componente Streamlit com estado que recebe callbacks de progresso do orquestrador e re-renderiza um placeholder mostrando a etapa atual do pipeline em tempo real.",
+   "tags": [
+    "component",
+    "event-handler",
+    "ui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:docs/apresentacao/build-deck.js:icon",
+   "type": "function",
+   "name": "icon",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "lineRange": [
+    52,
+    64
+   ],
+   "summary": "Renderiza um ícone React (lucide-react) para SVG, converte para PNG via sharp e armazena em cache, retornando um buffer de imagem pronto para embutir nos slides.",
+   "tags": [
+    "utility",
+    "code-generation",
+    "image-processing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:docs/apresentacao/build-deck.js:radarMotif",
+   "type": "function",
+   "name": "radarMotif",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "lineRange": [
+    76,
+    95
+   ],
+   "summary": "Desenha o motivo visual recorrente de 'radar' (círculos concêntricos) usado como marca d'água decorativa em vários slides do deck.",
+   "tags": [
+    "utility",
+    "code-generation",
+    "presentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:docs/apresentacao/build-deck.js:footer",
+   "type": "function",
+   "name": "footer",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "lineRange": [
+    113,
+    122
+   ],
+   "summary": "Adiciona o rodapé padrão (nome do projeto + número da página) a um slide do deck.",
+   "tags": [
+    "utility",
+    "code-generation",
+    "presentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:docs/apresentacao/build-deck.js:iconRow",
+   "type": "function",
+   "name": "iconRow",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "lineRange": [
+    132,
+    142
+   ],
+   "summary": "Renderiza uma linha composta por um badge de ícone, um título e um texto de corpo, padrão repetido em vários slides de destaques e componentes.",
+   "tags": [
+    "utility",
+    "code-generation",
+    "presentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:docs/apresentacao/build-deck.js:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "docs/apresentacao/build-deck.js",
+   "lineRange": [
+    157,
+    935
+   ],
+   "summary": "Função principal que monta todos os slides da apresentação (capa, motivação, arquitetura, pipeline, stack, resultados, bugs corrigidos, avaliação crítica e próximos passos) e grava o arquivo .pptx final em disco.",
+   "tags": [
+    "entry-point",
+    "code-generation",
+    "presentation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Função monolítica de ~780 linhas que constrói slide a slide de forma sequencial e imperativa — típico de scripts de geração de deck onde reuso de layout é feito via helpers (baseSlide, kicker, title, footer) em vez de componentes reutilizáveis por slide."
+  },
+  {
+   "id": "function:infra/export_reports.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "infra/export_reports.py",
+   "lineRange": [
+    25,
+    51
+   ],
+   "summary": "Lê as credenciais do Cosmos DB, lista os resumos de relatórios completos/parciais (opcionalmente filtrados por slug) e salva cada um localmente via LocalReportRepository.",
+   "tags": [
+    "cli",
+    "data-pipeline",
+    "database"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:infra/smoke_test.py:run_theme",
+   "type": "function",
+   "name": "run_theme",
+   "filePath": "infra/smoke_test.py",
+   "lineRange": [
+    36,
+    67
+   ],
+   "summary": "Executa a análise completa para um tema específico, mede o tempo decorrido e monta um resumo com contagem de evidências, tipos de fonte e status de aprovação dos critérios SC-001/SC-005.",
+   "tags": [
+    "test",
+    "validation",
+    "cli"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:infra/smoke_test.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "infra/smoke_test.py",
+   "lineRange": [
+    70,
+    83
+   ],
+   "summary": "Roda o smoke test para os dois temas do desafio ('Edge AI' e 'Robôs Humanoides para Indústria'), salva os resultados em JSON e imprime um resumo geral de aprovação.",
+   "tags": [
+    "test",
+    "cli",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:infra/spike_web_search.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "infra/spike_web_search.py",
+   "lineRange": [
+    26,
+    91
+   ],
+   "summary": "Conecta ao Azure AI Foundry, dispara uma pergunta real usando a ferramenta Web Search do agente, mede a latência e inspeciona/imprime o formato das citações de URL retornadas.",
+   "tags": [
+    "spike",
+    "azure",
+    "cli"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/agents/collector_agent.py",
+   "type": "file",
+   "name": "collector_agent.py",
+   "filePath": "src/radar/agents/collector_agent.py",
+   "summary": "Executa a coleta de mercado via Agente Coletor no Azure AI Foundry, fazendo perguntas multi-perspectiva estilo STORM (Web Search) e extraindo evidências das respostas com deduplicação de URLs e inferência de tipo de fonte.",
+   "tags": [
+    "ai-agent",
+    "web-search",
+    "collector",
+    "async",
+    "storm-pattern"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/agents/collector_agent.py:_infer_source_type",
+   "type": "function",
+   "name": "_infer_source_type",
+   "filePath": "src/radar/agents/collector_agent.py",
+   "lineRange": [
+    42,
+    52
+   ],
+   "summary": "Infere o tipo de fonte (ex.: acadêmica, notícia, blog) a partir do domínio de uma URL, usando heurísticas de correspondência de host.",
+   "tags": [
+    "utility",
+    "classification",
+    "url-parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "type": "function",
+   "name": "_ask_perspective",
+   "filePath": "src/radar/agents/collector_agent.py",
+   "lineRange": [
+    55,
+    98
+   ],
+   "summary": "Envia uma pergunta de uma perspectiva específica ao agente de IA com Web Search habilitado e converte as citações retornadas em objetos Evidence, deduplicando URLs já vistas.",
+   "tags": [
+    "ai-agent",
+    "web-search",
+    "async",
+    "evidence-extraction"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/agents/collector_agent.py:run_market_collection",
+   "type": "function",
+   "name": "run_market_collection",
+   "filePath": "src/radar/agents/collector_agent.py",
+   "lineRange": [
+    101,
+    130
+   ],
+   "summary": "Orquestra em paralelo múltiplas perguntas de perspectiva (asyncio.gather), consolidando evidências de mercado e reportando degradação parcial quando alguma pergunta falha.",
+   "tags": [
+    "orchestration",
+    "async",
+    "entry-point",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/agents/foundry.py",
+   "type": "file",
+   "name": "foundry.py",
+   "filePath": "src/radar/agents/foundry.py",
+   "summary": "Cria e configura o cliente OpenAI do Azure AI Foundry autenticado via DefaultAzureCredential, usado pelos agentes Coletor e Sintetizador.",
+   "tags": [
+    "azure-ai-foundry",
+    "client-factory",
+    "authentication",
+    "singleton"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "function",
+   "name": "get_openai_client",
+   "filePath": "src/radar/agents/foundry.py",
+   "lineRange": [
+    19,
+    30
+   ],
+   "summary": "Constrói o AIProjectClient do Azure AI Foundry com credencial padrão do Azure e retorna o cliente OpenAI compatível pronto para uso pelos agentes.",
+   "tags": [
+    "factory",
+    "azure",
+    "client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/agents/scope_guard.py",
+   "type": "file",
+   "name": "scope_guard.py",
+   "filePath": "src/radar/agents/scope_guard.py",
+   "summary": "Implementa a checagem de escopo temático que rejeita temas fora do domínio de tecnologia antes de disparar o pipeline caro de coleta e síntese.",
+   "tags": [
+    "guardrail",
+    "validation",
+    "ai-agent",
+    "scope-check",
+    "tested"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "type": "function",
+   "name": "is_in_scope",
+   "filePath": "src/radar/agents/scope_guard.py",
+   "lineRange": [
+    37,
+    51
+   ],
+   "summary": "Pergunta ao modelo de IA se o tema informado está dentro do escopo de tendências tecnológicas, retornando um booleano; falhas de rede propagam como ScopeCheckError para permitir fail-open no chamador.",
+   "tags": [
+    "validation",
+    "ai-agent",
+    "guardrail",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "file",
+   "name": "synthesizer_agent.py",
+   "filePath": "src/radar/agents/synthesizer_agent.py",
+   "summary": "Agente Sintetizador que monta o prompt com o corpus de evidências coletadas, chama o modelo de IA para gerar o painel executivo estruturado e faz o parsing/validação da resposta JSON em seções do relatório.",
+   "tags": [
+    "ai-agent",
+    "synthesis",
+    "json-parsing",
+    "validation",
+    "tested"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/agents/synthesizer_agent.py:_build_prompt",
+   "type": "function",
+   "name": "_build_prompt",
+   "filePath": "src/radar/agents/synthesizer_agent.py",
+   "lineRange": [
+    29,
+    59
+   ],
+   "summary": "Monta o prompt de síntese concatenando o tema e o corpus de evidências numeradas para orientar o modelo a citar fontes por id.",
+   "tags": [
+    "prompt-engineering",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/agents/synthesizer_agent.py:parse_synthesis_output",
+   "type": "function",
+   "name": "parse_synthesis_output",
+   "filePath": "src/radar/agents/synthesizer_agent.py",
+   "lineRange": [
+    62,
+    99
+   ],
+   "summary": "Valida e converte o JSON bruto retornado pelo modelo em uma lista de PanelSection, garantindo que toda afirmação não inferencial cite evidências existentes no corpus.",
+   "tags": [
+    "validation",
+    "parsing",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "type": "function",
+   "name": "synthesize",
+   "filePath": "src/radar/agents/synthesizer_agent.py",
+   "lineRange": [
+    102,
+    132
+   ],
+   "summary": "Chama o modelo de IA para gerar o painel executivo a partir do corpus de evidências, com timeout configurável, retornando um SynthesisResult ou levantando SynthesisError.",
+   "tags": [
+    "ai-agent",
+    "entry-point",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/radar/agents/synthesizer_agent.py:SynthesisResult",
+   "type": "class",
+   "name": "SynthesisResult",
+   "filePath": "src/radar/agents/synthesizer_agent.py",
+   "lineRange": [
+    23,
+    26
+   ],
+   "summary": "Estrutura de retorno da síntese contendo as seções do painel, a nota de escopo e avisos brutos emitidos pelo modelo.",
+   "tags": [
+    "data-model",
+    "result-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/collectors/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/radar/collectors/__init__.py",
+   "summary": "Arquivo de pacote vazio que marca o diretório collectors como um módulo Python.",
+   "tags": [
+    "package-marker",
+    "empty"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/collectors/arxiv.py",
+   "type": "file",
+   "name": "arxiv.py",
+   "filePath": "src/radar/collectors/arxiv.py",
+   "summary": "Coletor determinístico que consulta o feed Atom da API do arXiv para o tema informado e converte cada entrada em evidência acadêmica estruturada.",
+   "tags": [
+    "collector",
+    "academic",
+    "http-client",
+    "arxiv",
+    "tested"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "type": "class",
+   "name": "ArxivCollector",
+   "filePath": "src/radar/collectors/arxiv.py",
+   "lineRange": [
+    14,
+    53
+   ],
+   "summary": "Implementa a interface Collector consultando a API de busca do arXiv via HTTP e parseando o feed com feedparser para produzir evidências acadêmicas com tratamento de erro em CollectorResult.",
+   "tags": [
+    "collector",
+    "academic",
+    "http-client",
+    "implements-interface"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/collectors/base.py",
+   "type": "file",
+   "name": "base.py",
+   "filePath": "src/radar/collectors/base.py",
+   "summary": "Define a interface abstrata Collector e a estrutura de retorno CollectorResult usadas por todos os coletores de evidência (arXiv, OpenAlex, mercado).",
+   "tags": [
+    "interface",
+    "abstract-base",
+    "data-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/collectors/base.py:CollectorResult",
+   "type": "class",
+   "name": "CollectorResult",
+   "filePath": "src/radar/collectors/base.py",
+   "lineRange": [
+    12,
+    15
+   ],
+   "summary": "Estrutura de retorno padrão de um coletor, agregando a lista de evidências obtidas, uma flag de degradação e uma mensagem de erro opcional.",
+   "tags": [
+    "data-model",
+    "result-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/collectors/base.py:Collector",
+   "type": "class",
+   "name": "Collector",
+   "filePath": "src/radar/collectors/base.py",
+   "lineRange": [
+    18,
+    24
+   ],
+   "summary": "Interface abstrata que todo coletor de evidências (acadêmico ou de mercado) deve implementar, expondo nome, tipo de fonte e o método assíncrono collect.",
+   "tags": [
+    "interface",
+    "abstract-base"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/collectors/openalex.py",
+   "type": "file",
+   "name": "openalex.py",
+   "filePath": "src/radar/collectors/openalex.py",
+   "summary": "Coletor determinístico que consulta a API OpenAlex por trabalhos acadêmicos relacionados ao tema, reconstruindo resumos a partir do índice invertido e convertendo os resultados em evidências.",
+   "tags": [
+    "collector",
+    "academic",
+    "http-client",
+    "openalex",
+    "tested"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/collectors/openalex.py:_reconstruct_abstract",
+   "type": "function",
+   "name": "_reconstruct_abstract",
+   "filePath": "src/radar/collectors/openalex.py",
+   "lineRange": [
+    14,
+    21
+   ],
+   "summary": "Reconstrói o texto do resumo de um trabalho acadêmico a partir do índice invertido de palavras retornado pela API OpenAlex.",
+   "tags": [
+    "utility",
+    "text-processing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "type": "class",
+   "name": "OpenAlexCollector",
+   "filePath": "src/radar/collectors/openalex.py",
+   "lineRange": [
+    24,
+    72
+   ],
+   "summary": "Implementa a interface Collector consultando a API OpenAlex, extraindo título, resumo reconstruído, tipo de fonte e contagem de citações para cada trabalho relevante ao tema.",
+   "tags": [
+    "collector",
+    "academic",
+    "http-client",
+    "implements-interface"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/config.py",
+   "type": "file",
+   "name": "config.py",
+   "filePath": "src/radar/config.py",
+   "summary": "Define as configurações centrais da aplicação (endpoints do Azure AI Foundry, credenciais do Cosmos DB, orçamento de tempo de análise, limite diário) carregadas via variáveis de ambiente com cache.",
+   "tags": [
+    "configuration",
+    "settings",
+    "environment-variables",
+    "singleton"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/config.py:get_settings",
+   "type": "function",
+   "name": "get_settings",
+   "filePath": "src/radar/config.py",
+   "lineRange": [
+    28,
+    32
+   ],
+   "summary": "Retorna a instância cacheada de Settings, servindo como ponto único de acesso à configuração em toda a aplicação.",
+   "tags": [
+    "singleton",
+    "factory",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/config.py:Settings",
+   "type": "class",
+   "name": "Settings",
+   "filePath": "src/radar/config.py",
+   "lineRange": [
+    8,
+    22
+   ],
+   "summary": "Modelo de configuração da aplicação com endpoints do Azure AI Foundry, credenciais do Cosmos DB, orçamento de análise, limite diário de análises e flag de modo offline.",
+   "tags": [
+    "configuration",
+    "data-model",
+    "settings"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/models.py",
+   "type": "file",
+   "name": "models.py",
+   "filePath": "src/radar/models.py",
+   "summary": "Define o modelo de domínio central do Radar de Tendências: tipos de fonte e status, evidências, seções do painel com grau de suporte, e a estrutura completa do relatório e seu resumo para histórico.",
+   "tags": [
+    "data-model",
+    "domain-model",
+    "pydantic",
+    "core",
+    "tested"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/radar/models.py:SourceType",
+   "type": "class",
+   "name": "SourceType",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    14,
+    19
+   ],
+   "summary": "Enumeração dos tipos de fonte de evidência suportados (ex.: acadêmica, notícia, mercado) usada para classificar a origem de cada evidência coletada.",
+   "tags": [
+    "enum",
+    "type-definition",
+    "domain-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/models.py:SectionKey",
+   "type": "class",
+   "name": "SectionKey",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    22,
+    32
+   ],
+   "summary": "Enumeração das seções fixas que compõem o painel executivo gerado pelo Sintetizador (ex.: visão geral, cenário competitivo, riscos).",
+   "tags": [
+    "enum",
+    "type-definition",
+    "domain-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/models.py:ReportStatus",
+   "type": "class",
+   "name": "ReportStatus",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    38,
+    42
+   ],
+   "summary": "Enumeração dos estados possíveis de um relatório de análise (em andamento, completo, parcial, falho).",
+   "tags": [
+    "enum",
+    "type-definition",
+    "domain-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/models.py:SupportLevel",
+   "type": "class",
+   "name": "SupportLevel",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    45,
+    49
+   ],
+   "summary": "Enumeração dos níveis de força de evidência que fundamentam uma seção do painel (ex.: forte, moderado, fraco).",
+   "tags": [
+    "enum",
+    "type-definition",
+    "domain-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/models.py:Evidence",
+   "type": "class",
+   "name": "Evidence",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    52,
+    67
+   ],
+   "summary": "Modelo de uma evidência individual coletada (acadêmica ou de mercado), com id, título, tipo de fonte, url, data, trecho e método para truncar o snippet exibido.",
+   "tags": [
+    "data-model",
+    "domain-model",
+    "core"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/radar/models.py:SupportGrade",
+   "type": "class",
+   "name": "SupportGrade",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    70,
+    74
+   ],
+   "summary": "Modelo que resume a força de suporte de uma seção do painel, contendo contagem de evidências, diversidade de tipos de fonte, nível calculado e flag de divergência entre fontes.",
+   "tags": [
+    "data-model",
+    "domain-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/models.py:PanelSection",
+   "type": "class",
+   "name": "PanelSection",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    77,
+    91
+   ],
+   "summary": "Modelo de uma seção do painel executivo, com conteúdo em markdown, ids de evidências citadas, flag de inferência e validação que exige evidência quando o conteúdo não é declarado como inferência.",
+   "tags": [
+    "data-model",
+    "domain-model",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/radar/models.py:Report",
+   "type": "class",
+   "name": "Report",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    94,
+    106
+   ],
+   "summary": "Modelo completo de um relatório de análise, agregando tema, status, nota de escopo, seções do painel, evidências, fontes degradadas, avisos e métricas de execução.",
+   "tags": [
+    "data-model",
+    "domain-model",
+    "core",
+    "aggregate-root"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/radar/models.py:ReportSummary",
+   "type": "class",
+   "name": "ReportSummary",
+   "filePath": "src/radar/models.py",
+   "lineRange": [
+    109,
+    115
+   ],
+   "summary": "Versão resumida de um Report usada nas listagens de histórico, contendo apenas identificação, tema, status e visão geral de suporte.",
+   "tags": [
+    "data-model",
+    "domain-model",
+    "summary"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/orchestrator.py",
+   "type": "file",
+   "name": "orchestrator.py",
+   "filePath": "src/radar/orchestrator.py",
+   "summary": "Orquestra o pipeline completo de análise: checagem de escopo e limite diário, coleta acadêmica e de mercado em paralelo, deduplicação de evidências, síntese via IA e graduação de suporte, persistindo o progresso do relatório a cada etapa.",
+   "tags": [
+    "orchestration",
+    "pipeline",
+    "async",
+    "entry-point",
+    "error-handling",
+    "tested"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/radar/orchestrator.py:slugify",
+   "type": "function",
+   "name": "slugify",
+   "filePath": "src/radar/orchestrator.py",
+   "lineRange": [
+    43,
+    46
+   ],
+   "summary": "Converte o tema informado em um slug ASCII normalizado, usado como identificador legível do relatório no histórico.",
+   "tags": [
+    "utility",
+    "string-processing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/orchestrator.py:_check_daily_limit",
+   "type": "function",
+   "name": "_check_daily_limit",
+   "filePath": "src/radar/orchestrator.py",
+   "lineRange": [
+    49,
+    60
+   ],
+   "summary": "Verifica se o número de análises já executadas hoje excede o limite diário configurado, levantando RateLimitExceeded caso positivo.",
+   "tags": [
+    "rate-limiting",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "function",
+   "name": "run_analysis",
+   "filePath": "src/radar/orchestrator.py",
+   "lineRange": [
+    63,
+    182
+   ],
+   "summary": "Função central do pipeline: valida escopo e limite diário, dispara coleta acadêmica (arXiv/OpenAlex) e de mercado (agente Coletor) em paralelo, deduplica evidências, sintetiza o painel via IA, gradua o suporte de cada seção e salva o relatório incrementalmente com callbacks de progresso.",
+   "tags": [
+    "orchestration",
+    "entry-point",
+    "async",
+    "pipeline",
+    "error-handling"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/radar/orchestrator.py:ProgressEvent",
+   "type": "class",
+   "name": "ProgressEvent",
+   "filePath": "src/radar/orchestrator.py",
+   "lineRange": [
+    37,
+    40
+   ],
+   "summary": "Estrutura de evento de progresso emitida durante a execução do pipeline (estágio, detalhe e flag de conclusão), consumida pela interface Streamlit para atualizar o usuário em tempo real.",
+   "tags": [
+    "data-model",
+    "progress-tracking",
+    "ui-integration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/storage/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/radar/storage/__init__.py",
+   "summary": "Fábrica de repositório que seleciona entre a implementação local (arquivos JSON) e a implementação Cosmos DB conforme a configuração de ambiente.",
+   "tags": [
+    "factory",
+    "storage",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/storage/__init__.py:get_repository",
+   "type": "function",
+   "name": "get_repository",
+   "filePath": "src/radar/storage/__init__.py",
+   "lineRange": [
+    13,
+    29
+   ],
+   "summary": "Retorna a implementação de ReportRepository apropriada (Cosmos DB em produção ou armazenamento local em arquivos) com base nas configurações da aplicação.",
+   "tags": [
+    "factory",
+    "storage",
+    "dependency-injection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/storage/base.py",
+   "type": "file",
+   "name": "base.py",
+   "filePath": "src/radar/storage/base.py",
+   "summary": "Define a interface abstrata ReportRepository que toda implementação de persistência de relatórios (local ou Cosmos DB) deve seguir.",
+   "tags": [
+    "interface",
+    "abstract-base",
+    "storage"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/storage/base.py:ReportRepository",
+   "type": "class",
+   "name": "ReportRepository",
+   "filePath": "src/radar/storage/base.py",
+   "lineRange": [
+    10,
+    17
+   ],
+   "summary": "Interface abstrata de persistência de relatórios, exigindo métodos para salvar, buscar por id, listar resumos e localizar por slug de tema.",
+   "tags": [
+    "interface",
+    "abstract-base",
+    "storage"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/storage/cosmos.py",
+   "type": "file",
+   "name": "cosmos.py",
+   "filePath": "src/radar/storage/cosmos.py",
+   "summary": "Implementação do repositório de relatórios sobre o Azure Cosmos DB, com upsert com fallback de tamanho de documento, leitura por id e consultas para listagem de histórico e busca por slug.",
+   "tags": [
+    "storage",
+    "cosmos-db",
+    "database",
+    "persistence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/storage/cosmos.py:_to_summary",
+   "type": "function",
+   "name": "_to_summary",
+   "filePath": "src/radar/storage/cosmos.py",
+   "lineRange": [
+    61,
+    76
+   ],
+   "summary": "Converte um item bruto retornado pela query do Cosmos DB em um ReportSummary, extraindo a visão geral de suporte da primeira seção do relatório.",
+   "tags": [
+    "mapping",
+    "data-transformation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/storage/cosmos.py:CosmosReportRepository",
+   "type": "class",
+   "name": "CosmosReportRepository",
+   "filePath": "src/radar/storage/cosmos.py",
+   "lineRange": [
+    17,
+    58
+   ],
+   "summary": "Implementa ReportRepository usando o SDK do Azure Cosmos DB, criando banco e container sob demanda e expondo save, get, list_summaries e find_by_slug via queries particionadas por slug de tema.",
+   "tags": [
+    "storage",
+    "cosmos-db",
+    "implements-interface",
+    "database"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/storage/local.py",
+   "type": "file",
+   "name": "local.py",
+   "filePath": "src/radar/storage/local.py",
+   "summary": "Implementação do repositório de relatórios em arquivos JSON locais no disco, usada em desenvolvimento e testes como alternativa ao Cosmos DB.",
+   "tags": [
+    "storage",
+    "local-filesystem",
+    "persistence",
+    "testing",
+    "tested"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/storage/local.py:_to_summary",
+   "type": "function",
+   "name": "_to_summary",
+   "filePath": "src/radar/storage/local.py",
+   "lineRange": [
+    53,
+    66
+   ],
+   "summary": "Converte um Report completo em ReportSummary extraindo a visão geral de suporte da primeira seção, para uso nas listagens de histórico local.",
+   "tags": [
+    "mapping",
+    "data-transformation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/radar/storage/local.py:LocalReportRepository",
+   "type": "class",
+   "name": "LocalReportRepository",
+   "filePath": "src/radar/storage/local.py",
+   "lineRange": [
+    13,
+    50
+   ],
+   "summary": "Implementa ReportRepository persistindo cada relatório como um arquivo JSON no diretório de dados local, com métodos para salvar, ler, listar resumos ordenados por data e buscar por slug de tema.",
+   "tags": [
+    "storage",
+    "local-filesystem",
+    "implements-interface"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/synthesis/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "src/radar/synthesis/__init__.py",
+   "summary": "Arquivo de pacote vazio que marca o diretório synthesis como um módulo Python.",
+   "tags": [
+    "package-marker",
+    "empty"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/radar/synthesis/dedup.py",
+   "type": "file",
+   "name": "dedup.py",
+   "filePath": "src/radar/synthesis/dedup.py",
+   "summary": "Remove evidências duplicadas ou quase duplicadas comparando URLs normalizadas e similaridade de título, mantendo a versão mais rica em conteúdo de cada duplicata.",
+   "tags": [
+    "deduplication",
+    "text-similarity",
+    "data-cleaning",
+    "tested"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/radar/synthesis/dedup.py:_normalize_url",
+   "type": "function",
+   "name": "_normalize_url",
+   "filePath": "src/radar/synthesis/dedup.py",
+   "lineRange": [
+    15,
+    26
+   ],
+   "summary": "Normaliza uma URL removendo parâmetros de tracking comuns (utm_*, etc.) e ordenando a query string, para permitir comparação confiável de duplicatas.",
+   "tags": [
+    "url-normalization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/synthesis/dedup.py:dedup_evidence",
+   "type": "function",
+   "name": "dedup_evidence",
+   "filePath": "src/radar/synthesis/dedup.py",
+   "lineRange": [
+    44,
+    73
+   ],
+   "summary": "Deduplica uma lista de evidências comparando URL normalizada exata e similaridade de título via SequenceMatcher, preservando a evidência com maior riqueza de conteúdo em cada grupo de duplicatas.",
+   "tags": [
+    "deduplication",
+    "text-similarity",
+    "entry-point"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/radar/synthesis/grading.py",
+   "type": "file",
+   "name": "grading.py",
+   "filePath": "src/radar/synthesis/grading.py",
+   "summary": "Calcula o grau de suporte evidencial de cada seção do painel executivo, com base na quantidade e diversidade de tipos de fonte que sustentam o conteúdo.",
+   "tags": [
+    "grading",
+    "validation",
+    "evidence-scoring",
+    "tested"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/synthesis/grading.py:grade_section",
+   "type": "function",
+   "name": "grade_section",
+   "filePath": "src/radar/synthesis/grading.py",
+   "lineRange": [
+    18,
+    28
+   ],
+   "summary": "Calcula o SupportGrade de uma seção do painel contando evidências citadas, tipos de fonte distintos e detectando divergência entre fontes.",
+   "tags": [
+    "grading",
+    "evidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/radar/synthesis/grading.py:grade_report",
+   "type": "function",
+   "name": "grade_report",
+   "filePath": "src/radar/synthesis/grading.py",
+   "lineRange": [
+    31,
+    38
+   ],
+   "summary": "Aplica grade_section a todas as seções do painel executivo, retornando uma nova lista de seções com o campo support preenchido.",
+   "tags": [
+    "grading",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "tests/__init__.py",
+   "summary": "Arquivo de pacote vazio que marca o diretório tests como um módulo Python.",
+   "tags": [
+    "package-marker",
+    "test",
+    "empty"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/integration/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "tests/integration/__init__.py",
+   "summary": "Arquivo de pacote vazio que marca o diretório tests/integration como um módulo Python.",
+   "tags": [
+    "package-marker",
+    "test",
+    "empty"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/integration/test_history.py",
+   "type": "file",
+   "name": "test_history.py",
+   "filePath": "tests/integration/test_history.py",
+   "summary": "Testes de integração do repositório local de histórico, cobrindo o ciclo salvar/listar/reabrir, reabertura de temas repetidos por slug e visibilidade de relatórios parciais.",
+   "tags": [
+    "test",
+    "integration-test",
+    "storage",
+    "history"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tests/integration/test_history.py:test_save_list_reopen_roundtrip",
+   "type": "function",
+   "name": "test_save_list_reopen_roundtrip",
+   "filePath": "tests/integration/test_history.py",
+   "lineRange": [
+    21,
+    33
+   ],
+   "summary": "Verifica que um relatório salvo aparece na listagem de resumos e pode ser reaberto integralmente pelo id.",
+   "tags": [
+    "test",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_history.py:test_find_by_slug_offers_reopen_choice_for_repeated_theme",
+   "type": "function",
+   "name": "test_find_by_slug_offers_reopen_choice_for_repeated_theme",
+   "filePath": "tests/integration/test_history.py",
+   "lineRange": [
+    36,
+    50
+   ],
+   "summary": "Verifica que múltiplos relatórios do mesmo tema (mesmo slug) são todos retornados por find_by_slug, permitindo ao usuário escolher qual reabrir.",
+   "tags": [
+    "test",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_history.py:test_history_open_completes_without_network_dependency",
+   "type": "function",
+   "name": "test_history_open_completes_without_network_dependency",
+   "filePath": "tests/integration/test_history.py",
+   "lineRange": [
+    61,
+    72
+   ],
+   "summary": "Garante que reabrir um relatório do histórico funciona mesmo em uma nova instância do repositório sem qualquer chamada de rede.",
+   "tags": [
+    "test",
+    "integration-test",
+    "offline"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/integration/test_pipeline.py",
+   "type": "file",
+   "name": "test_pipeline.py",
+   "filePath": "tests/integration/test_pipeline.py",
+   "summary": "Suíte de testes de integração do pipeline completo (run_analysis), cobrindo caminho feliz, degradação parcial de fontes, exceções em coletores, falha de síntese, limite diário, escopo fora do tema e fail-open na checagem de escopo.",
+   "tags": [
+    "test",
+    "integration-test",
+    "pipeline",
+    "error-handling",
+    "mocking"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:_ev",
+   "type": "function",
+   "name": "_ev",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    14,
+    23
+   ],
+   "summary": "Função auxiliar de teste que cria rapidamente um objeto Evidence com id e tipo de fonte customizáveis, usada para montar cenários de teste.",
+   "tags": [
+    "test",
+    "test-helper",
+    "fixture"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_happy_path_completes_with_all_sources_ok",
+   "type": "function",
+   "name": "test_happy_path_completes_with_all_sources_ok",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    76,
+    95
+   ],
+   "summary": "Testa o caminho feliz do pipeline com todas as fontes acadêmicas e de mercado retornando evidências com sucesso, verificando conclusão sem degradação.",
+   "tags": [
+    "test",
+    "integration-test",
+    "happy-path"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_one_source_degraded_still_completes",
+   "type": "function",
+   "name": "test_one_source_degraded_still_completes",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    99,
+    116
+   ],
+   "summary": "Testa que o pipeline completa com sucesso mesmo quando uma das fontes de coleta retorna resultado degradado.",
+   "tags": [
+    "test",
+    "integration-test",
+    "resilience"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_raw_exception_in_one_academic_collector_still_completes",
+   "type": "function",
+   "name": "test_raw_exception_in_one_academic_collector_still_completes",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    120,
+    138
+   ],
+   "summary": "Testa que uma exceção não tratada lançada por um coletor acadêmico não interrompe o pipeline, sendo tratada como degradação daquela fonte.",
+   "tags": [
+    "test",
+    "integration-test",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_market_fully_degraded_academic_ok_still_completes",
+   "type": "function",
+   "name": "test_market_fully_degraded_academic_ok_still_completes",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    142,
+    158
+   ],
+   "summary": "Testa que o pipeline completa quando a coleta de mercado falha totalmente mas a coleta acadêmica é bem-sucedida.",
+   "tags": [
+    "test",
+    "integration-test",
+    "resilience"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_synthesis_api_error_yields_partial_not_crash",
+   "type": "function",
+   "name": "test_synthesis_api_error_yields_partial_not_crash",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    162,
+    183
+   ],
+   "summary": "Testa que um erro na chamada de síntese via IA resulta em um relatório parcial com aviso registrado, em vez de propagar uma exceção não tratada.",
+   "tags": [
+    "test",
+    "integration-test",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_all_sources_degraded_fails",
+   "type": "function",
+   "name": "test_all_sources_degraded_fails",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    187,
+    200
+   ],
+   "summary": "Testa que o pipeline reporta falha quando todas as fontes de evidência (acadêmicas e de mercado) estão degradadas simultaneamente.",
+   "tags": [
+    "test",
+    "integration-test",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_timeout_during_collection_yields_partial",
+   "type": "function",
+   "name": "test_timeout_during_collection_yields_partial",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    204,
+    221
+   ],
+   "summary": "Testa que um timeout durante a fase de coleta resulta em um relatório parcial em vez de travar ou falhar completamente o pipeline.",
+   "tags": [
+    "test",
+    "integration-test",
+    "timeout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_daily_rate_limit_enforced",
+   "type": "function",
+   "name": "test_daily_rate_limit_enforced",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    225,
+    237
+   ],
+   "summary": "Testa que o pipeline recusa novas análises após o limite diário configurado ser atingido, levantando RateLimitExceeded.",
+   "tags": [
+    "test",
+    "integration-test",
+    "rate-limiting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/integration/test_pipeline.py:test_scope_check_failure_fails_open_and_completes",
+   "type": "function",
+   "name": "test_scope_check_failure_fails_open_and_completes",
+   "filePath": "tests/integration/test_pipeline.py",
+   "lineRange": [
+    253,
+    276
+   ],
+   "summary": "Testa que uma falha na checagem de escopo (ex.: erro de rede no agente) resulta em fail-open, permitindo que o pipeline prossiga normalmente em vez de bloquear o usuário.",
+   "tags": [
+    "test",
+    "integration-test",
+    "fail-open",
+    "guardrail"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tests/unit/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "tests/unit/__init__.py",
+   "summary": "Arquivo vazio que marca o diretório tests/unit como um pacote Python para descoberta de testes.",
+   "tags": [
+    "test",
+    "package-marker",
+    "boilerplate"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/unit/test_collectors.py",
+   "type": "file",
+   "name": "test_collectors.py",
+   "filePath": "tests/unit/test_collectors.py",
+   "summary": "Testes unitários que validam os coletores arXiv e OpenAlex, cobrindo parsing de fixtures, timeouts degradados, filtragem de evidências sem URL e truncamento de snippets.",
+   "tags": [
+    "test",
+    "unit-test",
+    "collectors",
+    "http-mocking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tests/unit/test_dedup.py",
+   "type": "file",
+   "name": "test_dedup.py",
+   "filePath": "tests/unit/test_dedup.py",
+   "summary": "Testes unitários da lógica de deduplicação de evidências (dedup_evidence), cobrindo URLs com parâmetros de tracking, normalização de host/barra final e similaridade de títulos.",
+   "tags": [
+    "test",
+    "unit-test",
+    "deduplication"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tests/unit/test_grading.py",
+   "type": "file",
+   "name": "test_grading.py",
+   "filePath": "tests/unit/test_grading.py",
+   "summary": "Testes unitários do módulo de grading que classifica seções do relatório em níveis de confiança (baixo/médio/alto) com base em quantidade e diversidade de evidências.",
+   "tags": [
+    "test",
+    "unit-test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tests/unit/test_local_repo.py",
+   "type": "file",
+   "name": "test_local_repo.py",
+   "filePath": "tests/unit/test_local_repo.py",
+   "summary": "Testes unitários do repositório local de relatórios (LocalReportRepository), cobrindo salvamento, leitura pontual, listagem ordenada e busca por slug.",
+   "tags": [
+    "test",
+    "unit-test",
+    "storage",
+    "repository-pattern"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/unit/test_scope_guard.py",
+   "type": "file",
+   "name": "test_scope_guard.py",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "summary": "Testes unitários do guardrail de escopo (is_in_scope) que usa um LLM para validar se o tema pesquisado é tecnológico, incluindo casos de falha de API.",
+   "tags": [
+    "test",
+    "unit-test",
+    "scope-guardrail",
+    "llm-mocking"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/unit/test_synthesizer_parsing.py",
+   "type": "file",
+   "name": "test_synthesizer_parsing.py",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "summary": "Testes unitários do parser de saída do Agente Sintetizador, validando parsing de seções, preservação de notas de divergência e tratamento de erros de schema.",
+   "tags": [
+    "test",
+    "unit-test",
+    "synthesis",
+    "parsing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:.env.example",
+   "type": "config",
+   "name": ".env.example",
+   "filePath": ".env.example",
+   "summary": "Template de variáveis de ambiente necessárias para rodar o projeto localmente (endpoints do Azure AI Foundry, Cosmos DB, limites de análise e contato para a API OpenAlex).",
+   "tags": [
+    "configuration",
+    "environment-variables",
+    "secrets-template",
+    "azure"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.streamlit/config.toml",
+   "type": "config",
+   "name": "config.toml",
+   "filePath": ".streamlit/config.toml",
+   "summary": "Configuração do servidor e do navegador do Streamlit usada para servir o painel executivo da aplicação.",
+   "tags": [
+    "configuration",
+    "streamlit",
+    "ui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:infra/smoke_test_result.json",
+   "type": "config",
+   "name": "smoke_test_result.json",
+   "filePath": "infra/smoke_test_result.json",
+   "summary": "Resultado registrado de um smoke test de produção que valida a aplicação implantada no Azure após o deploy.",
+   "tags": [
+    "infrastructure",
+    "smoke-test",
+    "deployment-validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:infra/spike_result.json",
+   "type": "config",
+   "name": "spike_result.json",
+   "filePath": "infra/spike_result.json",
+   "summary": "Resultado de um spike técnico que valida a integração com o Azure AI Foundry (Web Search e coleta de citações) antes da implementação completa do agente.",
+   "tags": [
+    "infrastructure",
+    "spike",
+    "azure-ai-foundry",
+    "proof-of-concept"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:pyproject.toml",
+   "type": "config",
+   "name": "pyproject.toml",
+   "filePath": "pyproject.toml",
+   "summary": "Configuração do projeto Python: metadados do pacote, build via hatch, regras de lint do ruff e opções de execução do pytest.",
+   "tags": [
+    "configuration",
+    "build-system",
+    "python-packaging",
+    "linting",
+    "testing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:specs/001-radar-tendencias/contracts/report-schema.json",
+   "type": "config",
+   "name": "report-schema.json",
+   "filePath": "specs/001-radar-tendencias/contracts/report-schema.json",
+   "summary": "Contrato JSON Schema que define a estrutura obrigatória do relatório executivo gerado pelo pipeline (seções, evidências, campos obrigatórios).",
+   "tags": [
+    "configuration",
+    "json-schema",
+    "contract",
+    "data-validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:tests/fixtures/agent_citations.json",
+   "type": "config",
+   "name": "agent_citations.json",
+   "filePath": "tests/fixtures/agent_citations.json",
+   "summary": "Fixture com citações simuladas do Agente Coletor, organizadas por categoria (técnica, econômica, industrial, regulatória), usada em testes.",
+   "tags": [
+    "test-fixture",
+    "mock-data",
+    "citations"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:tests/fixtures/arxiv_atom.xml",
+   "type": "config",
+   "name": "arxiv_atom.xml",
+   "filePath": "tests/fixtures/arxiv_atom.xml",
+   "summary": "Fixture em formato Atom XML simulando uma resposta da API do arXiv, usada para testar o parsing do ArxivCollector.",
+   "tags": [
+    "test-fixture",
+    "mock-data",
+    "arxiv",
+    "atom-feed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:tests/fixtures/openalex_response.json",
+   "type": "config",
+   "name": "openalex_response.json",
+   "filePath": "tests/fixtures/openalex_response.json",
+   "summary": "Fixture JSON simulando uma resposta da API OpenAlex, usada para testar o parsing do OpenAlexCollector.",
+   "tags": [
+    "test-fixture",
+    "mock-data",
+    "openalex"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:tests/fixtures/synthesizer_output.json",
+   "type": "config",
+   "name": "synthesizer_output.json",
+   "filePath": "tests/fixtures/synthesizer_output.json",
+   "summary": "Fixture JSON com exemplos de saída do Agente Sintetizador (um caso válido e três casos inválidos) usada para testar o parser de síntese.",
+   "tags": [
+    "test-fixture",
+    "mock-data",
+    "synthesis",
+    "validation-cases"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:.specify/memory/constitution.md",
+   "type": "document",
+   "name": "constitution.md",
+   "filePath": ".specify/memory/constitution.md",
+   "summary": "Constituição do projeto que define princípios não negociáveis (evidência rastreável, simplicidade orientada a prazo, Azure-first, resiliência de demo, qualidade avaliável, avaliação crítica documentada) e o fluxo de governança.",
+   "tags": [
+    "documentation",
+    "constitution",
+    "project-governance",
+    "principles"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:CLAUDE.md",
+   "type": "document",
+   "name": "CLAUDE.md",
+   "filePath": "CLAUDE.md",
+   "summary": "Arquivo curto que direciona agentes Claude Code para o plano de implementação e demais artefatos de especificação do projeto (plan.md, research.md, data-model.md, contracts e constituição).",
+   "tags": [
+    "documentation",
+    "agent-instructions",
+    "project-context"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "document:README.md",
+   "type": "document",
+   "name": "README.md",
+   "filePath": "README.md",
+   "summary": "Documentação principal do projeto com visão geral da arquitetura, instruções para rodar localmente, testar, estrutura de pastas, deploy e avaliação crítica.",
+   "tags": [
+    "documentation",
+    "entry-point",
+    "getting-started",
+    "deployment"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/apresentacao/arguicao.md",
+   "type": "document",
+   "name": "arguicao.md",
+   "filePath": "docs/apresentacao/arguicao.md",
+   "summary": "Guia de preparação para a arguição da banca, com roteiro de abertura e respostas estruturadas sobre entendimento do problema, arquitetura da solução, qualidade de implementação, avaliação crítica e evoluções futuras.",
+   "tags": [
+    "documentation",
+    "presentation-prep",
+    "qa-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/apresentacao/criterios-avaliacao.md",
+   "type": "document",
+   "name": "criterios-avaliacao.md",
+   "filePath": "docs/apresentacao/criterios-avaliacao.md",
+   "summary": "Material de apoio que detalha os critérios de avaliação da banca (arquitetura da solução, qualidade de implementação, avaliação crítica) usados na preparação da apresentação do projeto.",
+   "tags": [
+    "documentation",
+    "evaluation-criteria",
+    "presentation-prep"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_arxiv_collector_parses_atom_fixture",
+   "type": "function",
+   "name": "test_arxiv_collector_parses_atom_fixture",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    16,
+    29
+   ],
+   "summary": "Verifica que o ArxivCollector interpreta corretamente uma fixture Atom XML e retorna evidências com URLs do domínio arXiv.",
+   "tags": [
+    "test",
+    "arxiv",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_arxiv_collector_timeout_returns_degraded_no_exception",
+   "type": "function",
+   "name": "test_arxiv_collector_timeout_returns_degraded_no_exception",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    34,
+    42
+   ],
+   "summary": "Garante que timeouts na API do arXiv resultam em degradação silenciosa da coleta, sem lançar exceção ao pipeline.",
+   "tags": [
+    "test",
+    "arxiv",
+    "error-handling",
+    "resilience"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_openalex_collector_parses_json_fixture",
+   "type": "function",
+   "name": "test_openalex_collector_parses_json_fixture",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    47,
+    60
+   ],
+   "summary": "Verifica que o OpenAlexCollector interpreta corretamente uma fixture JSON e retorna evidências válidas.",
+   "tags": [
+    "test",
+    "openalex",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_openalex_collector_server_error_returns_degraded",
+   "type": "function",
+   "name": "test_openalex_collector_server_error_returns_degraded",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    65,
+    72
+   ],
+   "summary": "Confirma que erros 5xx retornados pela API OpenAlex resultam em coleta degradada sem exceção.",
+   "tags": [
+    "test",
+    "openalex",
+    "error-handling",
+    "resilience"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_evidence_without_url_is_discarded",
+   "type": "function",
+   "name": "test_evidence_without_url_is_discarded",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    77,
+    89
+   ],
+   "summary": "Garante que registros do OpenAlex sem URL são descartados durante a coleta de evidências.",
+   "tags": [
+    "test",
+    "openalex",
+    "data-validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_openalex_null_source_does_not_crash_collection",
+   "type": "function",
+   "name": "test_openalex_null_source_does_not_crash_collection",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    94,
+    109
+   ],
+   "summary": "Verifica que fontes nulas (source ausente) nos resultados do OpenAlex não quebram a coleta de evidências.",
+   "tags": [
+    "test",
+    "openalex",
+    "edge-case",
+    "robustness"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_collectors.py:test_snippet_truncated_to_500_chars",
+   "type": "function",
+   "name": "test_snippet_truncated_to_500_chars",
+   "filePath": "tests/unit/test_collectors.py",
+   "lineRange": [
+    114,
+    128
+   ],
+   "summary": "Confirma que o snippet de evidência coletado do arXiv é truncado para no máximo 500 caracteres.",
+   "tags": [
+    "test",
+    "arxiv",
+    "data-validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:_ev",
+   "type": "function",
+   "name": "_ev",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    5,
+    16
+   ],
+   "summary": "Factory auxiliar que cria objetos Evidence com valores padrão sobrescrevíveis, usada para montar cenários de teste de deduplicação.",
+   "tags": [
+    "test-helper",
+    "factory",
+    "fixture"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_no_duplicates_returns_all",
+   "type": "function",
+   "name": "test_no_duplicates_returns_all",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    19,
+    25
+   ],
+   "summary": "Garante que evidências claramente distintas não são removidas pela deduplicação.",
+   "tags": [
+    "test",
+    "deduplication"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_duplicate_url_with_tracking_params_removed",
+   "type": "function",
+   "name": "test_duplicate_url_with_tracking_params_removed",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    28,
+    34
+   ],
+   "summary": "Verifica que URLs duplicadas diferindo apenas por parâmetros de tracking são deduplicadas corretamente.",
+   "tags": [
+    "test",
+    "deduplication",
+    "url-normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_duplicate_url_trailing_slash_and_case_insensitive_host",
+   "type": "function",
+   "name": "test_duplicate_url_trailing_slash_and_case_insensitive_host",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    37,
+    43
+   ],
+   "summary": "Confirma que barras finais e diferenças de maiúsculas/minúsculas no host não impedem a deduplicação de URLs.",
+   "tags": [
+    "test",
+    "deduplication",
+    "url-normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_similar_title_different_url_deduplicated",
+   "type": "function",
+   "name": "test_similar_title_different_url_deduplicated",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    46,
+    52
+   ],
+   "summary": "Verifica que evidências com títulos muito similares mas URLs diferentes são deduplicadas.",
+   "tags": [
+    "test",
+    "deduplication",
+    "similarity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_dissimilar_titles_not_deduplicated",
+   "type": "function",
+   "name": "test_dissimilar_titles_not_deduplicated",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    55,
+    61
+   ],
+   "summary": "Garante que títulos suficientemente diferentes não são deduplicados mesmo com outras semelhanças.",
+   "tags": [
+    "test",
+    "deduplication",
+    "similarity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_dedup.py:test_dedup_keeps_richer_metadata",
+   "type": "function",
+   "name": "test_dedup_keeps_richer_metadata",
+   "filePath": "tests/unit/test_dedup.py",
+   "lineRange": [
+    64,
+    72
+   ],
+   "summary": "Confirma que, ao deduplicar duas evidências equivalentes, a que possui metadados mais completos é mantida.",
+   "tags": [
+    "test",
+    "deduplication",
+    "data-quality"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:_ev",
+   "type": "function",
+   "name": "_ev",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    5,
+    14
+   ],
+   "summary": "Factory auxiliar que cria objetos Evidence com id e tipo de fonte customizáveis para os testes de grading.",
+   "tags": [
+    "test-helper",
+    "factory",
+    "fixture"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:_section",
+   "type": "function",
+   "name": "_section",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    21,
+    28
+   ],
+   "summary": "Factory auxiliar que constrói um PanelSection com lista de IDs de evidência, flag de inferência e nota de divergência.",
+   "tags": [
+    "test-helper",
+    "factory",
+    "fixture"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_inference_zero_evidence",
+   "type": "function",
+   "name": "test_inference_zero_evidence",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    31,
+    35
+   ],
+   "summary": "Verifica que seções marcadas como inferência sem nenhuma evidência recebem o grau de confiança apropriado.",
+   "tags": [
+    "test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_low_one_evidence",
+   "type": "function",
+   "name": "test_low_one_evidence",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    38,
+    43
+   ],
+   "summary": "Confirma que uma seção com apenas uma evidência recebe classificação de confiança baixa.",
+   "tags": [
+    "test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_medium_two_to_three_evidence",
+   "type": "function",
+   "name": "test_medium_two_to_three_evidence",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    46,
+    51
+   ],
+   "summary": "Verifica que seções com duas a três evidências recebem classificação de confiança média.",
+   "tags": [
+    "test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_medium_four_evidence_but_single_type_not_high",
+   "type": "function",
+   "name": "test_medium_four_evidence_but_single_type_not_high",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    54,
+    66
+   ],
+   "summary": "Garante que quatro evidências de um único tipo de fonte não elevam a seção a confiança alta, permanecendo em confiança média.",
+   "tags": [
+    "test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_high_four_evidence_two_types",
+   "type": "function",
+   "name": "test_high_four_evidence_two_types",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    69,
+    80
+   ],
+   "summary": "Confirma que quatro evidências de dois tipos de fonte distintos elevam a seção a confiança alta.",
+   "tags": [
+    "test",
+    "grading",
+    "confidence-scoring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_divergence_flag_mirrors_divergence_note",
+   "type": "function",
+   "name": "test_divergence_flag_mirrors_divergence_note",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    83,
+    87
+   ],
+   "summary": "Verifica que a flag de divergência reflete corretamente a presença de uma nota de divergência na seção.",
+   "tags": [
+    "test",
+    "grading",
+    "divergence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_grading.py:test_grade_report_fills_support_for_all_sections",
+   "type": "function",
+   "name": "test_grade_report_fills_support_for_all_sections",
+   "filePath": "tests/unit/test_grading.py",
+   "lineRange": [
+    90,
+    96
+   ],
+   "summary": "Garante que grade_report preenche o nível de suporte (confiança) para todas as seções do relatório.",
+   "tags": [
+    "test",
+    "grading",
+    "report-generation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:repo",
+   "type": "function",
+   "name": "repo",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    13,
+    18
+   ],
+   "summary": "Fixture pytest que prepara e limpa um diretório temporário e instancia o LocalReportRepository usado pelos testes.",
+   "tags": [
+    "test-fixture",
+    "setup-teardown",
+    "storage"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:test_save_and_get_point_read",
+   "type": "function",
+   "name": "test_save_and_get_point_read",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    25,
+    32
+   ],
+   "summary": "Verifica que um relatório salvo pode ser lido de volta pelo mesmo slug de tema (leitura pontual).",
+   "tags": [
+    "test",
+    "storage",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:test_get_wrong_theme_slug_returns_none",
+   "type": "function",
+   "name": "test_get_wrong_theme_slug_returns_none",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    35,
+    39
+   ],
+   "summary": "Garante que buscar um relatório com slug de tema incorreto retorna None em vez de erro.",
+   "tags": [
+    "test",
+    "storage",
+    "edge-case"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:test_get_missing_report_returns_none",
+   "type": "function",
+   "name": "test_get_missing_report_returns_none",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    42,
+    43
+   ],
+   "summary": "Confirma que buscar um relatório inexistente retorna None sem lançar erro.",
+   "tags": [
+    "test",
+    "storage",
+    "edge-case"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:test_list_summaries_sorted_by_created_at_desc",
+   "type": "function",
+   "name": "test_list_summaries_sorted_by_created_at_desc",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    46,
+    54
+   ],
+   "summary": "Verifica que a listagem de resumos de relatórios é retornada ordenada por data de criação decrescente.",
+   "tags": [
+    "test",
+    "storage",
+    "ordering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_local_repo.py:test_find_by_slug",
+   "type": "function",
+   "name": "test_find_by_slug",
+   "filePath": "tests/unit/test_local_repo.py",
+   "lineRange": [
+    57,
+    67
+   ],
+   "summary": "Testa a busca de relatórios por slug de tema entre múltiplos relatórios salvos no repositório.",
+   "tags": [
+    "test",
+    "storage",
+    "search"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:_fake_client",
+   "type": "function",
+   "name": "_fake_client",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    8,
+    13
+   ],
+   "summary": "Cria um cliente LLM simulado (mock) que retorna um texto de resposta pré-definido para os testes do guardrail de escopo.",
+   "tags": [
+    "test-helper",
+    "mocking",
+    "llm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:test_in_scope_theme_returns_true",
+   "type": "function",
+   "name": "test_in_scope_theme_returns_true",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    17,
+    20
+   ],
+   "summary": "Verifica que um tema tecnológico válido é classificado como dentro do escopo pelo guardrail.",
+   "tags": [
+    "test",
+    "scope-guardrail"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:test_out_of_scope_theme_returns_false",
+   "type": "function",
+   "name": "test_out_of_scope_theme_returns_false",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    24,
+    27
+   ],
+   "summary": "Confirma que um tema fora do escopo tecnológico é rejeitado pelo guardrail de escopo.",
+   "tags": [
+    "test",
+    "scope-guardrail"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:test_answer_is_case_insensitive_and_trims_whitespace",
+   "type": "function",
+   "name": "test_answer_is_case_insensitive_and_trims_whitespace",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    31,
+    34
+   ],
+   "summary": "Garante que a resposta do LLM é tratada de forma insensível a maiúsculas/minúsculas e a espaços em branco.",
+   "tags": [
+    "test",
+    "scope-guardrail",
+    "robustness"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:test_unexpected_answer_treated_as_out_of_scope",
+   "type": "function",
+   "name": "test_unexpected_answer_treated_as_out_of_scope",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    38,
+    41
+   ],
+   "summary": "Verifica que respostas inesperadas do LLM são tratadas como fora do escopo por segurança (fail-safe).",
+   "tags": [
+    "test",
+    "scope-guardrail",
+    "fail-safe"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_scope_guard.py:test_api_failure_raises_scope_check_error",
+   "type": "function",
+   "name": "test_api_failure_raises_scope_check_error",
+   "filePath": "tests/unit/test_scope_guard.py",
+   "lineRange": [
+    45,
+    50
+   ],
+   "summary": "Confirma que falhas na chamada da API do LLM propagam um ScopeCheckError em vez de falhar silenciosamente.",
+   "tags": [
+    "test",
+    "scope-guardrail",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:_load_fixture",
+   "type": "function",
+   "name": "_load_fixture",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    12,
+    14
+   ],
+   "summary": "Helper que carrega e decodifica um caso de fixture JSON do arquivo synthesizer_output.json a partir da chave informada.",
+   "tags": [
+    "test-helper",
+    "fixture-loading"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:_corpus",
+   "type": "function",
+   "name": "_corpus",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    17,
+    30
+   ],
+   "summary": "Constrói um corpus de evidências simuladas usado para validar a resolução de IDs de evidência durante o parsing da saída do sintetizador.",
+   "tags": [
+    "test-helper",
+    "factory",
+    "fixture"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_parses_all_sections",
+   "type": "function",
+   "name": "test_valid_output_parses_all_sections",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    33,
+    42
+   ],
+   "summary": "Verifica que uma saída válida do sintetizador é parseada em todas as seções esperadas do relatório.",
+   "tags": [
+    "test",
+    "synthesis",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_preserves_divergence_note",
+   "type": "function",
+   "name": "test_valid_output_preserves_divergence_note",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    45,
+    53
+   ],
+   "summary": "Confirma que a nota de divergência presente na saída do sintetizador é preservada após o parsing.",
+   "tags": [
+    "test",
+    "synthesis",
+    "divergence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_inference_section_has_no_evidence_required",
+   "type": "function",
+   "name": "test_valid_output_inference_section_has_no_evidence_required",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    56,
+    64
+   ],
+   "summary": "Garante que seções classificadas como inferência não exigem evidências associadas durante o parsing.",
+   "tags": [
+    "test",
+    "synthesis",
+    "inference"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_orphan_evidence_id_downgrades_to_inference_with_warning",
+   "type": "function",
+   "name": "test_orphan_evidence_id_downgrades_to_inference_with_warning",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    67,
+    75
+   ],
+   "summary": "Verifica que um ID de evidência órfão (sem correspondência no corpus) rebaixa a seção para inferência com aviso.",
+   "tags": [
+    "test",
+    "synthesis",
+    "data-validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_missing_required_field_raises_synthesis_error",
+   "type": "function",
+   "name": "test_missing_required_field_raises_synthesis_error",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    78,
+    83
+   ],
+   "summary": "Confirma que a ausência de um campo obrigatório na saída do sintetizador gera um SynthesisError.",
+   "tags": [
+    "test",
+    "synthesis",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/unit/test_synthesizer_parsing.py:test_bad_enum_key_raises_synthesis_error",
+   "type": "function",
+   "name": "test_bad_enum_key_raises_synthesis_error",
+   "filePath": "tests/unit/test_synthesizer_parsing.py",
+   "lineRange": [
+    86,
+    91
+   ],
+   "summary": "Verifica que uma chave de enum inválida na saída do sintetizador gera um SynthesisError.",
+   "tags": [
+    "test",
+    "synthesis",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "document:docs/architecture.md",
+   "type": "document",
+   "name": "architecture.md",
+   "filePath": "docs/architecture.md",
+   "summary": "Documento de arquitetura do Radar de Tendências Tecnológicas: descreve o diagrama de componentes (UI Streamlit, orquestrador, coletores determinísticos, agentes Azure AI Foundry, Cosmos DB), as decisões técnicas e o fluxo de dados de uma análise ponta a ponta, além de limitações arquiteturais conhecidas.",
+   "tags": [
+    "documentation",
+    "architecture",
+    "overview",
+    "azure-ai-foundry"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/critical-review.md",
+   "type": "document",
+   "name": "critical-review.md",
+   "filePath": "docs/critical-review.md",
+   "summary": "Registro de avaliação crítica contínua do projeto: bugs reais de produção (ex. COSMOS_KEY vazio), achados de provisionamento, resultados de smoke test, custos estimados, vieses e limitações conhecidas, e achados de code review priorizados para evolução futura.",
+   "tags": [
+    "documentation",
+    "post-mortem",
+    "cost-analysis",
+    "known-issues"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:infra/provision.md",
+   "type": "document",
+   "name": "provision.md",
+   "filePath": "infra/provision.md",
+   "summary": "Guia passo a passo de provisionamento da infraestrutura Azure do projeto: Cosmos DB serverless, App Service Linux B1, Managed Identity com role no projeto Foundry, App Settings, deploy via zip e freios de custo, com notas operacionais reais e verificação pós-deploy.",
+   "tags": [
+    "documentation",
+    "infrastructure",
+    "deployment",
+    "azure"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:requirements-dev.txt",
+   "type": "document",
+   "name": "requirements-dev.txt",
+   "filePath": "requirements-dev.txt",
+   "summary": "Lista de dependências Python de desenvolvimento (herda requirements.txt) incluindo pytest, pytest-asyncio, respx para mocks HTTP e ruff para lint, usadas nos testes e verificação de qualidade do pipeline.",
+   "tags": [
+    "dependencies",
+    "testing",
+    "lint",
+    "python"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "document:requirements.txt",
+   "type": "document",
+   "name": "requirements.txt",
+   "filePath": "requirements.txt",
+   "summary": "Lista de dependências Python de produção do Radar de Tendências Tecnológicas: Streamlit para a UI, SDKs do Azure AI Projects/Identity/Cosmos, httpx para chamadas HTTP, pydantic/pydantic-settings para modelos e configuração, feedparser para arXiv e plotly para gráficos.",
+   "tags": [
+    "dependencies",
+    "python",
+    "azure",
+    "streamlit"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/checklists/requirements.md",
+   "type": "document",
+   "name": "requirements.md",
+   "filePath": "specs/001-radar-tendencias/checklists/requirements.md",
+   "summary": "Checklist de qualidade da especificação da feature Radar de Tendências Tecnológicas, cobrindo qualidade de conteúdo, completude dos requisitos e prontidão da feature antes do planejamento.",
+   "tags": [
+    "documentation",
+    "spec-kit",
+    "quality-checklist",
+    "requirements"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "type": "document",
+   "name": "pipeline-contracts.md",
+   "filePath": "specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "summary": "Contratos internos dos módulos do pipeline: protocolo Collector, CollectorAgent (Foundry), SynthesizerAgent, funções puras de grading e dedup, Orchestrator, interface ReportRepository e o contrato UI-pipeline, servindo como especificação de interface para a implementação em src/radar.",
+   "tags": [
+    "documentation",
+    "api-contract",
+    "architecture",
+    "spec-kit"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/data-model.md",
+   "type": "document",
+   "name": "data-model.md",
+   "filePath": "specs/001-radar-tendencias/data-model.md",
+   "summary": "Modelo de dados da feature: define as entidades Evidence, PanelSection, SupportGrade (objeto calculado) e Report (documento raiz persistido no Cosmos DB), servindo de base para os modelos Pydantic em src/radar/models.py.",
+   "tags": [
+    "documentation",
+    "data-model",
+    "schema-definition",
+    "spec-kit"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/plan.md",
+   "type": "document",
+   "name": "plan.md",
+   "filePath": "specs/001-radar-tendencias/plan.md",
+   "summary": "Plano de implementação Spec-Kit da feature: contexto técnico, checagem de conformidade com a constituição do projeto, estrutura de diretórios do código-fonte e rastreamento de complexidade adotados para o Radar de Tendências Tecnológicas.",
+   "tags": [
+    "documentation",
+    "spec-kit",
+    "planning",
+    "project-structure"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/quickstart.md",
+   "type": "document",
+   "name": "quickstart.md",
+   "filePath": "specs/001-radar-tendencias/quickstart.md",
+   "summary": "Guia rápido para rodar o projeto localmente, executar os testes, provisionar a infraestrutura Azure (referenciando infra/provision.md) e seguir o roteiro de demonstração de 10 minutos usado na apresentação.",
+   "tags": [
+    "documentation",
+    "quickstart",
+    "onboarding",
+    "demo"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/research.md",
+   "type": "document",
+   "name": "research.md",
+   "filePath": "specs/001-radar-tendencias/research.md",
+   "summary": "Notas de pesquisa técnica que fundamentam as decisões do projeto: uso do Azure AI Foundry Agent Service, técnica multi-perspectiva inspirada no STORM, fontes acadêmicas determinísticas (arXiv/OpenAlex), escolha de UI/hospedagem, persistência, segredos, testes, algoritmo de grau de suporte, modo offline de demo, controle de abuso de custo e o guardrail de escopo.",
+   "tags": [
+    "documentation",
+    "research",
+    "spec-kit",
+    "storm",
+    "azure-ai-foundry"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/spec.md",
+   "type": "document",
+   "name": "spec.md",
+   "filePath": "specs/001-radar-tendencias/spec.md",
+   "summary": "Especificação funcional da feature com três histórias de usuário priorizadas (gerar painel executivo, consultar histórico, explorar evidências), casos extremos, requisitos funcionais, entidades-chave, critérios de sucesso mensuráveis e premissas assumidas.",
+   "tags": [
+    "documentation",
+    "spec-kit",
+    "user-stories",
+    "requirements"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:specs/001-radar-tendencias/tasks.md",
+   "type": "document",
+   "name": "tasks.md",
+   "filePath": "specs/001-radar-tendencias/tasks.md",
+   "summary": "Lista de tarefas de implementação organizadas em fases (setup, fundação, cada história de usuário, polimento/deploy/apresentação) com dependências, oportunidades de paralelização e estratégia de execução para o Radar de Tendências Tecnológicas.",
+   "tags": [
+    "documentation",
+    "spec-kit",
+    "task-breakdown",
+    "project-management"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:app/Home.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/Home.py",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/Home.py",
+   "target": "file:src/radar/storage/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/components/panel.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/components/progress.py",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/pages/1_Historico.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/pages/1_Historico.py",
+   "target": "file:src/radar/storage/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/pages/2_Evidencias.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/pages/2_Evidencias.py",
+   "target": "file:src/radar/storage/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/export_reports.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/export_reports.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/export_reports.py",
+   "target": "file:src/radar/storage/cosmos.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/export_reports.py",
+   "target": "file:src/radar/storage/local.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/gen_test_report.py",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/smoke_test.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/smoke_test.py",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:infra/spike_web_search.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:app/Home.py",
+   "target": "function:app/Home.py:_run_pipeline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_base_layout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:render_overview_charts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_source_type_mix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_perspective_distribution",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_maturity_radar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_top_origins",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_timeline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:_render_language_mix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/panel.py",
+   "target": "function:app/components/panel.py:render_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/progress.py",
+   "target": "class:app/components/progress.py:ProgressTracker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/apresentacao/build-deck.js",
+   "target": "function:docs/apresentacao/build-deck.js:icon",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/apresentacao/build-deck.js",
+   "target": "function:docs/apresentacao/build-deck.js:radarMotif",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/apresentacao/build-deck.js",
+   "target": "function:docs/apresentacao/build-deck.js:footer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/apresentacao/build-deck.js",
+   "target": "function:docs/apresentacao/build-deck.js:iconRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/apresentacao/build-deck.js",
+   "target": "function:docs/apresentacao/build-deck.js:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:infra/export_reports.py",
+   "target": "function:infra/export_reports.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:infra/smoke_test.py",
+   "target": "function:infra/smoke_test.py:run_theme",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:infra/smoke_test.py",
+   "target": "function:infra/smoke_test.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:infra/spike_web_search.py",
+   "target": "function:infra/spike_web_search.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:app/components/panel.py",
+   "target": "function:app/components/panel.py:render_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:app/components/progress.py",
+   "target": "class:app/components/progress.py:ProgressTracker",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:app/components/charts.py",
+   "target": "function:app/components/charts.py:render_overview_charts",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:app/Home.py:_run_pipeline",
+   "target": "class:app/components/progress.py:ProgressTracker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:app/components/panel.py:render_report",
+   "target": "function:app/components/charts.py:render_overview_charts",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "file:src/radar/agents/foundry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "file:src/radar/collectors/base.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/foundry.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "file:src/radar/agents/foundry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "file:src/radar/agents/foundry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/arxiv.py",
+   "target": "file:src/radar/collectors/base.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/arxiv.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/base.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "file:src/radar/collectors/base.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/agents/collector_agent.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/agents/scope_guard.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/collectors/arxiv.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/collectors/openalex.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/storage/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/synthesis/dedup.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:src/radar/synthesis/grading.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "file:src/radar/storage/base.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "file:src/radar/storage/local.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "file:src/radar/storage/cosmos.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/base.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/cosmos.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_history.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_history.py",
+   "target": "file:src/radar/storage/local.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/collectors/base.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/storage/local.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "file:src/radar/agents/scope_guard.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:_infer_source_type",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:run_market_collection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:_infer_source_type",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/collector_agent.py",
+   "target": "function:src/radar/agents/collector_agent.py:run_market_collection",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/foundry.py",
+   "target": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/foundry.py",
+   "target": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:_build_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:parse_synthesis_output",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "class:src/radar/agents/synthesizer_agent.py:SynthesisResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:_build_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:parse_synthesis_output",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "class:src/radar/agents/synthesizer_agent.py:SynthesisResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/collectors/arxiv.py",
+   "target": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/collectors/arxiv.py",
+   "target": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/collectors/base.py",
+   "target": "class:src/radar/collectors/base.py:CollectorResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/collectors/base.py",
+   "target": "class:src/radar/collectors/base.py:Collector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/collectors/base.py",
+   "target": "class:src/radar/collectors/base.py:CollectorResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/collectors/base.py",
+   "target": "class:src/radar/collectors/base.py:Collector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "function:src/radar/collectors/openalex.py:_reconstruct_abstract",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "function:src/radar/collectors/openalex.py:_reconstruct_abstract",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/config.py",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/config.py",
+   "target": "class:src/radar/config.py:Settings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/config.py",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/config.py",
+   "target": "class:src/radar/config.py:Settings",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SourceType",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SectionKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:ReportStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SupportLevel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:Evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SupportGrade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:PanelSection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:Report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:ReportSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SourceType",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SectionKey",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:ReportStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SupportLevel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:Evidence",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:SupportGrade",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:PanelSection",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:Report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "class:src/radar/models.py:ReportSummary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:slugify",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:_check_daily_limit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "class:src/radar/orchestrator.py:ProgressEvent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:slugify",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:_check_daily_limit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "class:src/radar/orchestrator.py:ProgressEvent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "function:src/radar/storage/__init__.py:get_repository",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/__init__.py",
+   "target": "function:src/radar/storage/__init__.py:get_repository",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/base.py",
+   "target": "class:src/radar/storage/base.py:ReportRepository",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/base.py",
+   "target": "class:src/radar/storage/base.py:ReportRepository",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/cosmos.py",
+   "target": "function:src/radar/storage/cosmos.py:_to_summary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/cosmos.py",
+   "target": "class:src/radar/storage/cosmos.py:CosmosReportRepository",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/cosmos.py",
+   "target": "function:src/radar/storage/cosmos.py:_to_summary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/cosmos.py",
+   "target": "class:src/radar/storage/cosmos.py:CosmosReportRepository",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "function:src/radar/storage/local.py:_to_summary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "class:src/radar/storage/local.py:LocalReportRepository",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "function:src/radar/storage/local.py:_to_summary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "class:src/radar/storage/local.py:LocalReportRepository",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "function:src/radar/synthesis/dedup.py:_normalize_url",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "function:src/radar/synthesis/dedup.py:dedup_evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "function:src/radar/synthesis/dedup.py:_normalize_url",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "function:src/radar/synthesis/dedup.py:dedup_evidence",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "function:src/radar/synthesis/grading.py:grade_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "function:src/radar/synthesis/grading.py:grade_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "function:src/radar/synthesis/grading.py:grade_section",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "function:src/radar/synthesis/grading.py:grade_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tests/integration/test_history.py",
+   "target": "function:tests/integration/test_history.py:test_save_list_reopen_roundtrip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_history.py",
+   "target": "function:tests/integration/test_history.py:test_find_by_slug_offers_reopen_choice_for_repeated_theme",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_history.py",
+   "target": "function:tests/integration/test_history.py:test_history_open_completes_without_network_dependency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:_ev",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_happy_path_completes_with_all_sources_ok",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_one_source_degraded_still_completes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_raw_exception_in_one_academic_collector_still_completes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_market_fully_degraded_academic_ok_still_completes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_synthesis_api_error_yields_partial_not_crash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_all_sources_degraded_fails",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_timeout_during_collection_yields_partial",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_daily_rate_limit_enforced",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/integration/test_pipeline.py",
+   "target": "function:tests/integration/test_pipeline.py:test_scope_check_failure_fails_open_and_completes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/synthesis/dedup.py:dedup_evidence",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/synthesis/grading.py:grade_report",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/storage/__init__.py:get_repository",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "function:src/radar/agents/collector_agent.py:run_market_collection",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:_check_daily_limit",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:_check_daily_limit",
+   "target": "function:src/radar/storage/__init__.py:get_repository",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "target": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/scope_guard.py:is_in_scope",
+   "target": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "target": "function:src/radar/config.py:get_settings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/synthesizer_agent.py:synthesize",
+   "target": "function:src/radar/agents/foundry.py:get_openai_client",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/storage/cosmos.py:_to_summary",
+   "target": "class:src/radar/models.py:ReportSummary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/storage/local.py:_to_summary",
+   "target": "class:src/radar/models.py:ReportSummary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/synthesis/grading.py:grade_section",
+   "target": "class:src/radar/models.py:SupportGrade",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/radar/agents/collector_agent.py:_ask_perspective",
+   "target": "class:src/radar/models.py:Evidence",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "target": "class:src/radar/collectors/base.py:CollectorResult",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "target": "class:src/radar/models.py:Evidence",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "target": "class:src/radar/collectors/base.py:CollectorResult",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "target": "class:src/radar/models.py:Evidence",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_happy_path_completes_with_all_sources_ok",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_one_source_degraded_still_completes",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_raw_exception_in_one_academic_collector_still_completes",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_market_fully_degraded_academic_ok_still_completes",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_synthesis_api_error_yields_partial_not_crash",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_all_sources_degraded_fails",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_timeout_during_collection_yields_partial",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_daily_rate_limit_enforced",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_pipeline.py:test_scope_check_failure_fails_open_and_completes",
+   "target": "function:src/radar/orchestrator.py:run_analysis",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_history.py:test_save_list_reopen_roundtrip",
+   "target": "class:src/radar/models.py:Report",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_history.py:test_find_by_slug_offers_reopen_choice_for_repeated_theme",
+   "target": "class:src/radar/models.py:Report",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tests/integration/test_history.py:test_history_open_completes_without_network_dependency",
+   "target": "class:src/radar/models.py:Report",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "target": "class:src/radar/collectors/base.py:Collector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "target": "class:src/radar/collectors/base.py:Collector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/radar/storage/local.py:LocalReportRepository",
+   "target": "class:src/radar/storage/base.py:ReportRepository",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/radar/storage/cosmos.py:CosmosReportRepository",
+   "target": "class:src/radar/storage/base.py:ReportRepository",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "function:src/radar/storage/__init__.py:get_repository",
+   "target": "class:src/radar/storage/local.py:LocalReportRepository",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "function:src/radar/storage/__init__.py:get_repository",
+   "target": "class:src/radar/storage/cosmos.py:CosmosReportRepository",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "class:src/radar/collectors/arxiv.py:ArxivCollector",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "function:src/radar/orchestrator.py:run_analysis",
+   "target": "class:src/radar/collectors/openalex.py:OpenAlexCollector",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "file:tests/integration/test_history.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/orchestrator.py",
+   "target": "file:tests/integration/test_pipeline.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "file:tests/integration/test_pipeline.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "file:tests/integration/test_pipeline.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "file:tests/integration/test_pipeline.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_arxiv_collector_parses_atom_fixture",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_arxiv_collector_timeout_returns_degraded_no_exception",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_openalex_collector_parses_json_fixture",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_openalex_collector_server_error_returns_degraded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_evidence_without_url_is_discarded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_openalex_null_source_does_not_crash_collection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "function:tests/unit/test_collectors.py:test_snippet_truncated_to_500_chars",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:_ev",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_no_duplicates_returns_all",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_duplicate_url_with_tracking_params_removed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_duplicate_url_trailing_slash_and_case_insensitive_host",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_similar_title_different_url_deduplicated",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_dissimilar_titles_not_deduplicated",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "function:tests/unit/test_dedup.py:test_dedup_keeps_richer_metadata",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:_ev",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_inference_zero_evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_low_one_evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_medium_two_to_three_evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_medium_four_evidence_but_single_type_not_high",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_high_four_evidence_two_types",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_divergence_flag_mirrors_divergence_note",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "function:tests/unit/test_grading.py:test_grade_report_fills_support_for_all_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:repo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:test_save_and_get_point_read",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:test_get_wrong_theme_slug_returns_none",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:test_get_missing_report_returns_none",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:test_list_summaries_sorted_by_created_at_desc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "function:tests/unit/test_local_repo.py:test_find_by_slug",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:_fake_client",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:test_in_scope_theme_returns_true",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:test_out_of_scope_theme_returns_false",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:test_answer_is_case_insensitive_and_trims_whitespace",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:test_unexpected_answer_treated_as_out_of_scope",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "function:tests/unit/test_scope_guard.py:test_api_failure_raises_scope_check_error",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:_load_fixture",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:_corpus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_parses_all_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_preserves_divergence_note",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_valid_output_inference_section_has_no_evidence_required",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_orphan_evidence_id_downgrades_to_inference_with_warning",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_missing_required_field_raises_synthesis_error",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "function:tests/unit/test_synthesizer_parsing.py:test_bad_enum_key_raises_synthesis_error",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "file:src/radar/collectors/arxiv.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "file:src/radar/collectors/openalex.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_dedup.py",
+   "target": "file:src/radar/synthesis/dedup.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_grading.py",
+   "target": "file:src/radar/synthesis/grading.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_local_repo.py",
+   "target": "file:src/radar/storage/local.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_scope_guard.py",
+   "target": "file:src/radar/agents/scope_guard.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "file:src/radar/models.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/radar/collectors/arxiv.py",
+   "target": "file:tests/unit/test_collectors.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/collectors/openalex.py",
+   "target": "file:tests/unit/test_collectors.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "file:tests/unit/test_collectors.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "file:tests/unit/test_dedup.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/synthesis/dedup.py",
+   "target": "file:tests/unit/test_dedup.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "file:tests/unit/test_grading.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/synthesis/grading.py",
+   "target": "file:tests/unit/test_grading.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "file:tests/unit/test_local_repo.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/storage/local.py",
+   "target": "file:tests/unit/test_local_repo.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/agents/scope_guard.py",
+   "target": "file:tests/unit/test_scope_guard.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/agents/synthesizer_agent.py",
+   "target": "file:tests/unit/test_synthesizer_parsing.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/radar/models.py",
+   "target": "file:tests/unit/test_synthesizer_parsing.py",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "config:tests/fixtures/arxiv_atom.xml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:tests/unit/test_collectors.py",
+   "target": "config:tests/fixtures/openalex_response.json",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:tests/unit/test_synthesizer_parsing.py",
+   "target": "config:tests/fixtures/synthesizer_output.json",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:specs/001-radar-tendencias/contracts/report-schema.json",
+   "target": "file:src/radar/models.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.env.example",
+   "target": "file:src/radar/agents/scope_guard.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:README.md",
+   "target": "config:pyproject.toml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:.specify/memory/constitution.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "document:.specify/memory/constitution.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/apresentacao/arguicao.md",
+   "target": "document:docs/apresentacao/criterios-avaliacao.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:infra/spike_result.json",
+   "target": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:infra/smoke_test_result.json",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/architecture.md",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/architecture.md",
+   "target": "file:app/Home.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/critical-review.md",
+   "target": "file:infra/smoke_test.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/critical-review.md",
+   "target": "file:src/radar/storage/cosmos.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:infra/provision.md",
+   "target": "file:src/radar/storage/cosmos.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:infra/provision.md",
+   "target": "file:src/radar/config.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:requirements.txt",
+   "target": "file:app/Home.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:requirements-dev.txt",
+   "target": "document:requirements.txt",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/checklists/requirements.md",
+   "target": "document:specs/001-radar-tendencias/spec.md",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/collectors/base.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/agents/collector_agent.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/agents/synthesizer_agent.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/synthesis/grading.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/synthesis/dedup.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/orchestrator.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+   "target": "file:src/radar/storage/base.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/data-model.md",
+   "target": "file:src/radar/models.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/plan.md",
+   "target": "document:specs/001-radar-tendencias/spec.md",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/plan.md",
+   "target": "document:specs/001-radar-tendencias/research.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/plan.md",
+   "target": "document:specs/001-radar-tendencias/data-model.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/quickstart.md",
+   "target": "document:infra/provision.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/quickstart.md",
+   "target": "file:app/Home.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/research.md",
+   "target": "file:src/radar/agents/foundry.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/research.md",
+   "target": "file:src/radar/agents/scope_guard.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/research.md",
+   "target": "file:src/radar/synthesis/grading.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/research.md",
+   "target": "file:src/radar/storage/local.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/spec.md",
+   "target": "file:app/pages/1_Historico.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/spec.md",
+   "target": "file:app/pages/2_Evidencias.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/tasks.md",
+   "target": "document:specs/001-radar-tendencias/spec.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:specs/001-radar-tendencias/tasks.md",
+   "target": "document:specs/001-radar-tendencias/plan.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ],
+ "layers": [
+  {
+   "id": "layer:ui",
+   "name": "Camada de Apresentação (UI Streamlit)",
+   "description": "Páginas e componentes Streamlit (Home, Histórico, Evidências, gráficos Plotly e barra de progresso) que recebem o tema do usuário, disparam o pipeline de análise e renderizam o painel executivo resultante.",
+   "nodeIds": [
+    "file:app/Home.py",
+    "file:app/__init__.py",
+    "file:app/components/__init__.py",
+    "file:app/components/charts.py",
+    "file:app/components/panel.py",
+    "file:app/components/progress.py",
+    "file:app/pages/1_Historico.py",
+    "file:app/pages/2_Evidencias.py",
+    "file:app/pages/__init__.py"
+   ]
+  },
+  {
+   "id": "layer:data-collection",
+   "name": "Agentes e Coletores de Evidências",
+   "description": "Agente Coletor e Agente Sintetizador executados no Azure AI Foundry (com o cliente Foundry e o guardrail de escopo temático) e os coletores acadêmicos determinísticos (arXiv, OpenAlex) que reúnem evidências multi-perspectiva estilo STORM.",
+   "nodeIds": [
+    "file:src/radar/agents/__init__.py",
+    "file:src/radar/agents/collector_agent.py",
+    "file:src/radar/agents/foundry.py",
+    "file:src/radar/agents/scope_guard.py",
+    "file:src/radar/agents/synthesizer_agent.py",
+    "file:src/radar/collectors/__init__.py",
+    "file:src/radar/collectors/arxiv.py",
+    "file:src/radar/collectors/base.py",
+    "file:src/radar/collectors/openalex.py"
+   ]
+  },
+  {
+   "id": "layer:synthesis",
+   "name": "Síntese e Lógica de Domínio",
+   "description": "Funções puras que deduplicam evidências quase idênticas e calculam o grau de suporte evidencial de cada seção do painel executivo antes da persistência.",
+   "nodeIds": [
+    "file:src/radar/synthesis/__init__.py",
+    "file:src/radar/synthesis/dedup.py",
+    "file:src/radar/synthesis/grading.py"
+   ]
+  },
+  {
+   "id": "layer:storage",
+   "name": "Persistência",
+   "description": "Interface abstrata de repositório de relatórios e suas duas implementações concretas — Azure Cosmos DB em produção e arquivos JSON locais para desenvolvimento e testes.",
+   "nodeIds": [
+    "file:src/radar/storage/__init__.py",
+    "file:src/radar/storage/base.py",
+    "file:src/radar/storage/cosmos.py",
+    "file:src/radar/storage/local.py"
+   ]
+  },
+  {
+   "id": "layer:core",
+   "name": "Núcleo do Domínio e Orquestração",
+   "description": "Modelos de domínio Pydantic (Evidence, Report, PanelSection), configurações centrais carregadas via variáveis de ambiente e o orquestrador que coordena escopo, coleta paralela, dedup, síntese e grading em cada análise.",
+   "nodeIds": [
+    "file:src/__init__.py",
+    "file:src/radar/__init__.py",
+    "file:src/radar/config.py",
+    "file:src/radar/models.py",
+    "file:src/radar/orchestrator.py"
+   ]
+  },
+  {
+   "id": "layer:test",
+   "name": "Testes",
+   "description": "Testes unitários e de integração cobrindo coletores, deduplicação, grading, guardrail de escopo, parsing do Sintetizador e o pipeline completo, apoiados por fixtures que simulam respostas do arXiv, OpenAlex e do Agente Sintetizador.",
+   "nodeIds": [
+    "file:tests/__init__.py",
+    "file:tests/integration/__init__.py",
+    "file:tests/integration/test_history.py",
+    "file:tests/integration/test_pipeline.py",
+    "file:tests/unit/__init__.py",
+    "file:tests/unit/test_collectors.py",
+    "file:tests/unit/test_dedup.py",
+    "file:tests/unit/test_grading.py",
+    "file:tests/unit/test_local_repo.py",
+    "file:tests/unit/test_scope_guard.py",
+    "file:tests/unit/test_synthesizer_parsing.py",
+    "config:tests/fixtures/agent_citations.json",
+    "config:tests/fixtures/arxiv_atom.xml",
+    "config:tests/fixtures/openalex_response.json",
+    "config:tests/fixtures/synthesizer_output.json"
+   ]
+  },
+  {
+   "id": "layer:infrastructure",
+   "name": "Infraestrutura, Operações e Configuração",
+   "description": "Scripts operacionais de exportação de relatórios, smoke test e spike técnico contra o Azure AI Foundry/Cosmos DB real, seus resultados registrados, o diretório de relatórios offline e os arquivos de configuração de ambiente, Streamlit e build Python do projeto.",
+   "nodeIds": [
+    "file:infra/export_reports.py",
+    "file:infra/gen_test_report.py",
+    "file:infra/smoke_test.py",
+    "file:infra/spike_web_search.py",
+    "config:infra/smoke_test_result.json",
+    "config:infra/spike_result.json",
+    "document:infra/provision.md",
+    "file:data/reports/.gitkeep",
+    "config:.env.example",
+    "config:.streamlit/config.toml",
+    "config:pyproject.toml",
+    "document:requirements-dev.txt",
+    "document:requirements.txt"
+   ]
+  },
+  {
+   "id": "layer:documentation",
+   "name": "Documentação e Apresentação",
+   "description": "Documentação de arquitetura e avaliação crítica do projeto, materiais de preparação para a arguição da banca (roteiro, critérios, diagramas) e o deck de apresentação gerado programaticamente, além dos arquivos de entrada README.md e CLAUDE.md.",
+   "nodeIds": [
+    "file:docs/apresentacao/build-deck.js",
+    "file:docs/apresentacao/criterios/01-arquitetura.drawio",
+    "file:docs/apresentacao/criterios/02-qualidade-implementacao.drawio",
+    "file:docs/apresentacao/criterios/03-avaliacao-critica.drawio",
+    "file:docs/apresentacao/radar-tendencias-apresentacao.pptx",
+    "document:docs/apresentacao/arguicao.md",
+    "document:docs/apresentacao/criterios-avaliacao.md",
+    "document:docs/architecture.md",
+    "document:docs/critical-review.md",
+    "document:CLAUDE.md",
+    "document:README.md"
+   ]
+  },
+  {
+   "id": "layer:spec-kit",
+   "name": "Especificação do Projeto (Spec-Kit)",
+   "description": "Artefatos formais do fluxo Spec-Kit — especificação funcional, plano de implementação, pesquisa técnica, modelo de dados, contratos de pipeline, checklist de requisitos e lista de tarefas — e a constituição do projeto que fundamentam a implementação em src/radar.",
+   "nodeIds": [
+    "config:specs/001-radar-tendencias/contracts/report-schema.json",
+    "document:specs/001-radar-tendencias/checklists/requirements.md",
+    "document:specs/001-radar-tendencias/contracts/pipeline-contracts.md",
+    "document:specs/001-radar-tendencias/data-model.md",
+    "document:specs/001-radar-tendencias/plan.md",
+    "document:specs/001-radar-tendencias/quickstart.md",
+    "document:specs/001-radar-tendencias/research.md",
+    "document:specs/001-radar-tendencias/spec.md",
+    "document:specs/001-radar-tendencias/tasks.md",
+    "document:.specify/memory/constitution.md"
+   ]
+  }
+ ],
+ "tour": [
+  {
+   "order": 1,
+   "title": "Visão Geral do Projeto",
+   "description": "O README apresenta o Radar de Tendências Tecnológicas: uma plataforma que recebe um tema (ex.: 'Edge AI') e devolve um painel executivo de 10 seções, fundamentado em evidências verificáveis coletadas na internet. Em um parágrafo ele já revela toda a arquitetura que este tour vai percorrer: Streamlit como UI, coleta acadêmica determinística combinada com um Agente Coletor no Azure AI Foundry, um Agente Sintetizador, grau de suporte calculado em código (não pelo LLM) e persistência em Cosmos DB com modo offline. Use este mapa mental como bússola para os próximos passos.",
+   "nodeIds": [
+    "document:README.md"
+   ]
+  },
+  {
+   "order": 2,
+   "title": "Ponto de Entrada: Home.py",
+   "description": "Home.py é onde a jornada do usuário começa: a página Streamlit recebe o tema de interesse, verifica se já existe um relatório reaproveitável, e caso não exista, dispara o pipeline completo de coleta e síntese. É também o ponto onde o painel executivo final é renderizado de volta na tela. Todo o resto do código-fonte existe para dar suporte a esta única jornada: tema entra, painel sai.",
+   "nodeIds": [
+    "file:app/Home.py"
+   ],
+   "languageLesson": "Streamlit reexecuta o script inteiro a cada interação do usuário; por isso o app usa st.session_state para lembrar se um relatório já foi gerado entre reruns, evitando disparar o pipeline caro repetidamente."
+  },
+  {
+   "order": 3,
+   "title": "O Vocabulário do Domínio: models.py",
+   "description": "models.py é o arquivo mais referenciado de todo o projeto (27 dependências apontando para ele) porque define o vocabulário comum usado por todas as camadas: Evidence (uma evidência com URL e tipo de fonte), PanelSection (uma seção do painel com seu grau de suporte) e Report (o documento raiz persistido no Cosmos DB). Entender essas estruturas primeiro torna todo o pipeline subsequente muito mais legível, já que orquestrador, agentes, storage e UI compartilham exatamente estes mesmos tipos.",
+   "nodeIds": [
+    "file:src/radar/models.py"
+   ],
+   "languageLesson": "Os modelos usam Pydantic para validação de dados e serialização; tipos como SourceType e ReportStatus são Enums que restringem valores possíveis, tornando erros de dados detectáveis em tempo de execução antes de chegarem ao Cosmos DB."
+  },
+  {
+   "order": 4,
+   "title": "Configuração Central: config.py",
+   "description": "Antes de ver o orquestrador em ação, vale conhecer config.py, o segundo arquivo mais dependido do projeto (11 referências). Ele centraliza endpoints do Azure AI Foundry, credenciais do Cosmos DB, o orçamento de tempo de uma análise e o limite diário de execuções — tudo carregado de variáveis de ambiente e cacheado. Esses limites (orçamento de tempo, limite diário) são os mesmos que o orquestrador do próximo passo consulta para decidir se e como rodar o pipeline.",
+   "nodeIds": [
+    "file:src/radar/config.py"
+   ],
+   "languageLesson": "A configuração usa pydantic-settings com cache (lru_cache), garantindo uma única leitura das variáveis de ambiente por processo — um padrão singleton leve e testável em Python."
+  },
+  {
+   "order": 5,
+   "title": "O Orquestrador do Pipeline",
+   "description": "orchestrator.py é o maestro: usando os modelos do Passo 3 e a configuração do Passo 4, ele coordena checagem de escopo e de limite diário, dispara a coleta acadêmica e de mercado em paralelo, deduplica as evidências, aciona a síntese via IA e calcula o grau de suporte — persistindo o progresso do relatório a cada etapa. É o arquivo com maior fan-out do projeto (19 dependências), refletindo seu papel de amarrar todas as camadas seguintes.",
+   "nodeIds": [
+    "file:src/radar/orchestrator.py"
+   ],
+   "languageLesson": "A coleta acadêmica e de mercado roda em paralelo via asyncio (async/await), reduzindo a latência total da análise em vez de somar o tempo de cada coletor sequencialmente."
+  },
+  {
+   "order": 6,
+   "title": "Guardrail de Escopo Temático",
+   "description": "Antes de gastar tempo e dinheiro com coleta e síntese via IA, o orquestrador chama scope_guard.py para verificar se o tema pesquisado é realmente tecnológico. Esse guardrail rejeita temas fora do domínio (ex.: 'receita de bolo') logo no início, protegendo o pipeline caro descrito no Passo 5 de uso indevido — uma decisão de design recente e explícita do projeto.",
+   "nodeIds": [
+    "file:src/radar/agents/scope_guard.py"
+   ],
+   "languageLesson": "O guardrail segue um padrão fail-open: se a chamada ao LLM de verificação falhar, o sistema prefere deixar o pipeline seguir a bloquear um usuário legítimo por uma falha de infraestrutura — uma escolha deliberada de resiliência sobre rigidez."
+  },
+  {
+   "order": 7,
+   "title": "Coleta Acadêmica Determinística",
+   "description": "Com o escopo aprovado, o orquestrador dispara os coletores acadêmicos, que implementam a interface Collector definida em base.py. arxiv.py consulta o feed Atom da API do arXiv e openalex.py consulta a API OpenAlex reconstruindo resumos a partir do índice invertido — ambos convertendo resultados em objetos Evidence (Passo 3). Diferente do Agente Coletor do próximo passo, esta coleta é 100% determinística: mesma entrada, mesma saída, sem chamadas a LLM.",
+   "nodeIds": [
+    "file:src/radar/collectors/base.py",
+    "file:src/radar/collectors/arxiv.py",
+    "file:src/radar/collectors/openalex.py"
+   ],
+   "languageLesson": "base.py define uma classe abstrata (ABC) Collector e uma CollectorResult; qualquer novo coletor (acadêmico ou não) só precisa implementar essa interface para se plugar ao orquestrador sem alterar mais nada — o clássico padrão Strategy."
+  },
+  {
+   "order": 8,
+   "title": "Agente Coletor no Azure AI Foundry",
+   "description": "Em paralelo à coleta acadêmica, collector_agent.py executa a coleta de mercado usando um agente hospedado no Azure AI Foundry (via o cliente configurado em foundry.py), fazendo perguntas multi-perspectiva inspiradas na técnica STORM da Stanford OVAL e usando a ferramenta Web Search. As respostas são convertidas em evidências com deduplicação de URL e inferência de tipo de fonte, alimentando o mesmo pipeline de dedup e síntese que vem a seguir.",
+   "nodeIds": [
+    "file:src/radar/agents/collector_agent.py",
+    "file:src/radar/agents/foundry.py"
+   ],
+   "languageLesson": "foundry.py autentica o cliente via DefaultAzureCredential (Managed Identity em produção, credenciais locais em dev), evitando qualquer chave de API hardcoded no código-fonte."
+  },
+  {
+   "order": 9,
+   "title": "Deduplicação de Evidências",
+   "description": "Depois que a coleta acadêmica (Passo 7) e a coleta de mercado (Passo 8) retornam em paralelo, dedup.py entra em ação para remover evidências duplicadas ou quase duplicadas, comparando URLs normalizadas e similaridade de título e mantendo sempre a versão mais rica em conteúdo. Esta é uma função pura e determinística — sem chamadas a LLM — o que a torna rápida e totalmente testável isoladamente.",
+   "nodeIds": [
+    "file:src/radar/synthesis/dedup.py"
+   ],
+   "languageLesson": "A normalização de URL remove parâmetros de tracking e barras finais antes da comparação, enquanto a similaridade de títulos usa uma métrica de sobreposição de tokens para pegar duplicatas quase-idênticas que uma comparação exata de string perderia."
+  },
+  {
+   "order": 10,
+   "title": "Agente Sintetizador e o Contrato do Relatório",
+   "description": "Com o corpus de evidências já deduplicado, synthesizer_agent.py monta o prompt para o modelo de IA gerar o painel executivo estruturado, e então faz o parsing e validação da resposta JSON em seções do relatório. report-schema.json é o contrato formal que essa resposta precisa obedecer — funcionando como uma rede de segurança contra respostas malformadas do LLM antes que cheguem aos modelos Pydantic do Passo 3.",
+   "nodeIds": [
+    "file:src/radar/agents/synthesizer_agent.py",
+    "config:specs/001-radar-tendencias/contracts/report-schema.json"
+   ],
+   "languageLesson": "Validar a saída de um LLM contra um JSON Schema explícito é uma prática essencial em pipelines de IA generativa: transforma texto livre e não confiável em dados estruturados com garantias de forma antes de qualquer lógica de negócio consumir o resultado."
+  },
+  {
+   "order": 11,
+   "title": "Grau de Suporte Evidencial",
+   "description": "Uma decisão arquitetural central do projeto (destacada já no README) é que o grau de suporte de cada seção do painel é calculado em código, não pelo LLM. grading.py implementa exatamente isso: classifica cada PanelSection (Passo 3) em baixo/médio/alto com base na quantidade e diversidade de tipos de fonte que a sustentam, tornando o nível de confiança auditável e reproduzível.",
+   "nodeIds": [
+    "file:src/radar/synthesis/grading.py"
+   ],
+   "languageLesson": "Delegar o grading a uma função pura e determinística — em vez de pedir ao próprio LLM que se autoavalie — elimina uma fonte clássica de viés de confirmação em sistemas baseados em IA generativa."
+  },
+  {
+   "order": 12,
+   "title": "Persistência: Cosmos DB e Modo Local",
+   "description": "Com o relatório sintetizado e graduado, o orquestrador o persiste através da interface ReportRepository definida em storage/base.py. A fábrica em storage/__init__.py escolhe entre cosmos.py (Azure Cosmos DB serverless em produção, com upsert e fallback de tamanho de documento) e local.py (arquivos JSON, usados em desenvolvimento, testes e no modo offline RADAR_OFFLINE=1 citado no README) conforme a configuração de ambiente do Passo 4.",
+   "nodeIds": [
+    "file:src/radar/storage/base.py",
+    "file:src/radar/storage/__init__.py",
+    "file:src/radar/storage/local.py",
+    "file:src/radar/storage/cosmos.py"
+   ],
+   "languageLesson": "Este é o padrão Repository combinado com uma factory: o orquestrador e a UI dependem apenas da interface abstrata, nunca da implementação concreta — trocar Cosmos DB por arquivos locais é uma mudança de configuração, não de código."
+  },
+  {
+   "order": 13,
+   "title": "Renderizando o Painel Executivo",
+   "description": "Fechando o ciclo iniciado em Home.py, panel.py renderiza o Report (Passo 3) como um painel de 10 seções com badges de nível de suporte (Passo 11), delegando os gráficos de visão geral para charts.py (mix de fontes, radar de maturidade, linha do tempo). As páginas adicionais 1_Historico.py e 2_Evidencias.py completam a experiência do usuário, permitindo consultar relatórios já gerados e explorar evidências brutas por trás de cada seção.",
+   "nodeIds": [
+    "file:app/components/panel.py",
+    "file:app/components/charts.py",
+    "file:app/pages/1_Historico.py",
+    "file:app/pages/2_Evidencias.py"
+   ],
+   "languageLesson": "charts.py fixa uma paleta categórica única para todos os gráficos Plotly, garantindo que a mesma cor represente sempre o mesmo tipo de fonte em qualquer relatório — consistência visual entre sessões distintas do Streamlit."
+  },
+  {
+   "order": 14,
+   "title": "Arquitetura Documentada",
+   "description": "docs/architecture.md consolida em um único lugar tudo o que este tour percorreu passo a passo: o diagrama de componentes (UI, orquestrador, coletores, agentes, Cosmos DB), as decisões técnicas por trás de cada escolha e o fluxo de dados de uma análise ponta a ponta, além de limitações arquiteturais conhecidas. É a referência a consultar quando a visão de conjunto do código-fonte precisar ser relembrada.",
+   "nodeIds": [
+    "document:docs/architecture.md"
+   ]
+  },
+  {
+   "order": 15,
+   "title": "Testes de Integração e Avaliação Crítica",
+   "description": "test_pipeline.py testa o pipeline inteiro construído nos passos anteriores (run_analysis) cobrindo o caminho feliz, degradação parcial de fontes, exceções em coletores, falha de síntese, limite diário e o guardrail de escopo do Passo 6 — inclusive seu comportamento fail-open. docs/critical-review.md complementa com uma avaliação crítica honesta e contínua do projeto: bugs reais de produção (como a chave do Cosmos DB vazia), resultados de smoke test e limitações conhecidas, encerrando o tour com uma visão madura de onde o sistema é sólido e onde ainda pode evoluir.",
+   "nodeIds": [
+    "file:tests/integration/test_pipeline.py",
+    "document:docs/critical-review.md"
+   ],
+   "languageLesson": "Os testes de integração usam pytest-asyncio para exercitar corrotinas assíncronas de ponta a ponta e mocks (respx) para simular respostas de APIs externas sem depender de rede real durante a suíte de testes."
+  }
+ ]
+}
