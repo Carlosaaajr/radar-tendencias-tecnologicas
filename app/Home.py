@@ -17,7 +17,12 @@ from components.panel import render_report  # noqa: E402
 from components.progress import ProgressTracker  # noqa: E402
 
 from radar.models import ReportStatus  # noqa: E402
-from radar.orchestrator import RateLimitExceeded, run_analysis, slugify  # noqa: E402
+from radar.orchestrator import (  # noqa: E402
+    OutOfScopeError,
+    RateLimitExceeded,
+    run_analysis,
+    slugify,
+)
 from radar.storage import get_repository  # noqa: E402
 
 st.set_page_config(page_title="Radar de Tendências Tecnológicas", page_icon="📡", layout="wide")
@@ -57,6 +62,8 @@ def _run_pipeline(theme_text: str) -> None:
         st.session_state.current_report = report
     except RateLimitExceeded as exc:
         st.error(f"🚫 {exc}")
+    except OutOfScopeError as exc:
+        st.warning(f"🎯 {exc}")
     except Exception as exc:  # noqa: BLE001 — falha inesperada, nunca deve travar a UI
         st.error(f"❌ A análise falhou de forma inesperada: {exc}")
     finally:

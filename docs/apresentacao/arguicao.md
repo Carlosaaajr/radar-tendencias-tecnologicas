@@ -108,7 +108,7 @@ um id que não existe no corpus, o código rebaixa a seção para "inferência"
 automaticamente. É auditável e testado — 7 testes unitários só para essa regra.
 
 **P: Quantos testes tem o projeto? Cobrem o quê?**
-R: 43 testes automatizados (unitários + integração), mais um smoke test real contra
+R: 50 testes automatizados (unitários + integração), mais um smoke test real contra
 produção. Cobrem os módulos críticos: deduplicação, graduação de suporte, parsing da
 saída do LLM, coletores (com mocks de API), e o orquestrador completo — incluindo
 cenários de falha (fonte degradada, timeout, erro de API).
@@ -156,6 +156,21 @@ documentado. Mas a mitigação estrutural importa mais que a sanitização de te
 que o prompt seja manipulado, o grau de suporte nunca é calculado pelo LLM, então não
 dá para "convencer" o sistema a mostrar grau Alto sem evidências reais no corpus.
 
+**P: Foi implementado algum guardrail para garantir que o sistema não aceita perguntas
+fora do contexto industrial?**
+R: Sim — `src/radar/agents/scope_guard.py`. Antes de rodar o pipeline caro (coleta +
+síntese), uma chamada única, curta e barata ao Foundry classifica se o tema é uma
+tendência/tecnologia/conceito industrial válido. Se não for (ex.: "qual a capital da
+França?"), a análise é recusada **antes** de gastar qualquer coleta ou persistir
+qualquer documento — a UI mostra um aviso amigável. Testado ao vivo contra o Foundry
+real com 4 temas (2 dentro, 2 fora de escopo): classificação correta nos 4 casos.
+Detalhe importante de resiliência: se essa checagem de escopo falhar (rede, API fora do
+ar), o comportamento é **fail-open** — a análise prossegue normalmente, porque uma
+falha num checador auxiliar nunca pode bloquear um tema legítimo (mesmo Princípio IV
+que rege o resto do pipeline). Limitação residual conhecida: essas chamadas de
+classificação não são, elas mesmas, limitadas pelo `MAX_ANALYSES_PER_DAY` — registrado
+como evolução futura menor.
+
 **P: O que vocês fariam diferente com mais tempo?**
 R: Popular o campo de métricas (tokens/custo real por etapa, hoje vazio — gap
 documentado), validar que as 10 seções sempre vêm completas do Sintetizador (hoje falha
@@ -189,7 +204,7 @@ justificativa registrada.
 | User stories da spec | 3 (painel, histórico, evidências) |
 | Requisitos funcionais | 15 (FR-001 a FR-015) |
 | Critérios de sucesso mensuráveis | 7 (SC-001 a SC-007) |
-| Testes automatizados | 43 |
+| Testes automatizados | 50 |
 | Perspectivas de busca concorrentes | 4 (técnica, econômica, industrial, regulatória) |
 | Smoke test — Edge AI | 123s, 53 evidências, 4 tipos de fonte, 10/10 seções |
 | Smoke test — Robôs Humanoides | 37s, 44 evidências, 3 tipos de fonte, 10/10 seções |

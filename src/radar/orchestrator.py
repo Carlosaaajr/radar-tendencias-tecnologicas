@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from radar.agents.collector_agent import run_market_collection
+from radar.agents.scope_guard import ScopeCheckError, is_in_scope
 from radar.agents.synthesizer_agent import synthesize
 from radar.collectors.arxiv import ArxivCollector
 from radar.collectors.openalex import OpenAlexCollector
@@ -21,10 +22,15 @@ from radar.synthesis.dedup import dedup_evidence
 from radar.synthesis.grading import grade_report
 
 MIN_EVIDENCE_FOR_CONFIDENT_REPORT = 5
+SCOPE_CHECK_TIMEOUT_S = 15
 
 
 class RateLimitExceeded(Exception):
     """Limite diário de análises (MAX_ANALYSES_PER_DAY, R10) atingido."""
+
+
+class OutOfScopeError(Exception):
+    """Tema não parece ser uma tendência tecnológica/industrial (guardrail de escopo)."""
 
 
 @dataclass
@@ -65,6 +71,18 @@ async def run_analysis(
             on_progress(ProgressEvent(stage=stage, detail=detail, done=done))
 
     _check_daily_limit()
+
+    try:
+        in_scope = await asyncio.wait_for(is_in_scope(theme), timeout=SCOPE_CHECK_TIMEOUT_S)
+    except (TimeoutError, ScopeCheckError):
+        # Falha do classificador nunca bloqueia uma análise legítima (Princípio IV) —
+        # fail-open: segue como se estivesse dentro de escopo.
+        in_scope = True
+    if not in_scope:
+        raise OutOfScopeError(
+            f'O tema "{theme}" não parece ser uma tendência tecnológica ou industrial. '
+            'Tente reformular (ex.: "Edge AI", "Robôs Humanoides para Indústria").'
+        )
 
     settings = get_settings()
     budget = budget_s if budget_s is not None else settings.analysis_budget_seconds

@@ -6,7 +6,7 @@ import pytest
 
 from radar.collectors.base import CollectorResult
 from radar.models import Evidence, ReportStatus, SourceType
-from radar.orchestrator import RateLimitExceeded, run_analysis
+from radar.orchestrator import OutOfScopeError, RateLimitExceeded, run_analysis
 
 TMP_DIR = Path("tests/fixtures/_tmp_pipeline_repo")
 
@@ -54,6 +54,12 @@ def local_repo(monkeypatch):
     monkeypatch.setattr("radar.orchestrator.get_repository", lambda: repo)
     yield repo
     shutil.rmtree(TMP_DIR, ignore_errors=True)
+
+
+@pytest.fixture(autouse=True)
+def default_in_scope(monkeypatch):
+    """Por padrão todo tema é aceito nos testes — os testes do guardrail sobrescrevem isso."""
+    monkeypatch.setattr("radar.orchestrator.is_in_scope", AsyncMock(return_value=True))
 
 
 def _patch_synthesize(raw: dict = VALID_SYNTHESIS_RAW):
@@ -229,3 +235,42 @@ async def test_daily_rate_limit_enforced(monkeypatch):
         await run_analysis("Edge AI")
 
     config_module._settings = None
+
+
+@pytest.mark.asyncio
+async def test_out_of_scope_theme_raises_and_persists_nothing(monkeypatch, local_repo):
+    """Guardrail de escopo: tema fora de contexto nunca chega a rodar o pipeline caro
+    nem a poluir o historico com um relatorio."""
+    monkeypatch.setattr("radar.orchestrator.is_in_scope", AsyncMock(return_value=False))
+
+    with pytest.raises(OutOfScopeError):
+        await run_analysis("qual a capital da frança?")
+
+    assert local_repo.list_summaries() == []
+
+
+@pytest.mark.asyncio
+async def test_scope_check_failure_fails_open_and_completes(monkeypatch):
+    """Se o classificador de escopo falhar (rede/API), a analise MUST prosseguir
+    normalmente — nunca bloquear um tema legitimo por falha de um checador auxiliar
+    (Principio IV)."""
+    from radar.agents.scope_guard import ScopeCheckError
+
+    monkeypatch.setattr(
+        "radar.orchestrator.is_in_scope", AsyncMock(side_effect=ScopeCheckError("boom"))
+    )
+    academic = CollectorResult(evidence=[_ev("ev-101", SourceType.SCIENTIFIC)])
+    market = CollectorResult(evidence=[_ev("ev-201", SourceType.MARKET)])
+
+    with (
+        patch("radar.orchestrator.ArxivCollector") as MockArxiv,
+        patch("radar.orchestrator.OpenAlexCollector") as MockOpenAlex,
+        patch("radar.orchestrator.run_market_collection", new=AsyncMock(return_value=market)),
+        _patch_synthesize(),
+    ):
+        MockArxiv.return_value.collect = AsyncMock(return_value=academic)
+        MockOpenAlex.return_value.collect = AsyncMock(return_value=CollectorResult(evidence=[]))
+
+        report = await run_analysis("Edge AI")
+
+    assert report.status == ReportStatus.COMPLETED

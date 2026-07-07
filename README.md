@@ -43,10 +43,11 @@ pytest              # unit + integration, tudo mockado — sem custo, sem creden
 pytest -m live       # smoke test contra Azure real (exige .env válido; consome tokens/RU)
 ```
 
-43 testes automatizados cobrem os módulos críticos do pipeline (Princípio V): dedup,
-grau de suporte, parsing/validação da saída do Sintetizador, coletores acadêmicos e o
-orquestrador completo (fluxo feliz, degradação parcial e total, timeout, erros de API).
-Validado também com smoke test real contra Foundry/Cosmos de produção (`infra/smoke_test.py`).
+50 testes automatizados cobrem os módulos críticos do pipeline (Princípio V): dedup,
+grau de suporte, parsing/validação da saída do Sintetizador, coletores acadêmicos, o
+guardrail de escopo (`scope_guard.py`) e o orquestrador completo (fluxo feliz,
+degradação parcial e total, timeout, erros de API, tema fora de escopo). Validado
+também com smoke test real contra Foundry/Cosmos de produção (`infra/smoke_test.py`).
 
 ## Estrutura do projeto
 

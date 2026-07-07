@@ -214,6 +214,31 @@ Decision / Rationale / Alternatives.
   código, mas exige validar interferência com WebSocket do Streamlit; adiado para
   evolução futura junto com multiusuário.
 
+## R11. Guardrail de escopo (achado real — pergunta da banca antecipada)
+
+- **Decision**: antes de iniciar o pipeline caro (coleta + síntese), uma chamada única,
+  curta e barata ao Foundry (`is_in_scope()`, `src/radar/agents/scope_guard.py`) — sem
+  ferramentas, sem Web Search — classifica se o tema é uma tendência/tecnologia/conceito
+  industrial válido. Se não for, `run_analysis` levanta `OutOfScopeError` **antes** de
+  persistir qualquer documento no Cosmos, e a UI mostra aviso amigável sem gastar o
+  pipeline completo. Se a chamada de classificação falhar (rede/API), o comportamento é
+  **fail-open**: a análise prossegue normalmente — nunca bloqueia um tema legítimo por
+  falha de um checador auxiliar (Princípio IV).
+- **Rationale**: lacuna real identificada — nenhuma validação de escopo existia; um
+  tema qualquer ("qual a capital da França?") disparava o pipeline inteiro (arXiv +
+  OpenAlex + 4 buscas do Coletor + síntese), com custo real e risco de constrangimento
+  numa demo ao vivo se testado pela banca. Validado contra o Foundry real com 4 temas
+  (2 dentro, 2 fora de escopo) — classificação correta nos 4 casos.
+- **Alternatives considered**: heurística sem custo de LLM (tamanho mínimo/máximo do
+  texto) — rejeitada (não detecta tema fora de contexto de verdade, só evita string
+  vazia/spam trivial); bloquear localmente sem chamar o modelo — rejeitado (exigiria uma
+  lista de palavras-chave frágil e fácil de contornar).
+- **Limitação residual**: as chamadas de classificação de escopo em si não são
+  limitadas por `MAX_ANALYSES_PER_DAY` (que só conta relatórios persistidos) — um
+  usuário poderia gerar muitas chamadas de classificação (custo bem menor que o
+  pipeline completo, mas não nulo) sem acionar o limite diário. Registrado como
+  evolução futura menor.
+
 ## Sources
 
 - [Use Grounding with Bing Search tools with the agents API — Microsoft Learn](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/bing-tools)
