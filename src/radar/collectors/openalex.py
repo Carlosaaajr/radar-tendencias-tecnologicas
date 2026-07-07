@@ -5,10 +5,21 @@ from __future__ import annotations
 import httpx
 
 from radar.collectors.base import CollectorResult
+from radar.collectors.industrial_scope import (
+    INDUSTRIAL_QUALIFIER_TERMS,
+    needs_industrial_scoping,
+)
 from radar.config import get_settings
 from radar.models import SNIPPET_MAX_LENGTH, Evidence, SourceType
 
 OPENALEX_API_URL = "https://api.openalex.org/works"
+
+
+def _build_search_query(theme: str) -> str:
+    if needs_industrial_scoping(theme):
+        qualifier = " OR ".join(f'"{term}"' for term in INDUSTRIAL_QUALIFIER_TERMS)
+        return f"{theme} AND ({qualifier})"
+    return theme
 
 
 def _reconstruct_abstract(inverted_index: dict[str, list[int]] | None) -> str:
@@ -29,7 +40,7 @@ class OpenAlexCollector:
         self, theme: str, *, limit: int = 10, timeout_s: float = 30
     ) -> CollectorResult:
         settings = get_settings()
-        params: dict[str, str | int] = {"search": theme, "per_page": limit}
+        params: dict[str, str | int] = {"search": _build_search_query(theme), "per_page": limit}
         if settings.openalex_mailto:
             params["mailto"] = settings.openalex_mailto
 

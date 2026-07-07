@@ -6,9 +6,21 @@ import feedparser
 import httpx
 
 from radar.collectors.base import CollectorResult
+from radar.collectors.industrial_scope import (
+    INDUSTRIAL_QUALIFIER_TERMS,
+    needs_industrial_scoping,
+)
 from radar.models import SNIPPET_MAX_LENGTH, Evidence, SourceType
 
 ARXIV_API_URL = "https://export.arxiv.org/api/query"
+
+
+def _build_search_query(theme: str) -> str:
+    query = f"all:{theme}"
+    if needs_industrial_scoping(theme):
+        qualifier = " OR ".join(f'all:"{term}"' for term in INDUSTRIAL_QUALIFIER_TERMS)
+        query = f"{query} AND ({qualifier})"
+    return query
 
 
 class ArxivCollector:
@@ -19,7 +31,7 @@ class ArxivCollector:
         self, theme: str, *, limit: int = 10, timeout_s: float = 30
     ) -> CollectorResult:
         params = {
-            "search_query": f"all:{theme}",
+            "search_query": _build_search_query(theme),
             "max_results": limit,
         }
         try:

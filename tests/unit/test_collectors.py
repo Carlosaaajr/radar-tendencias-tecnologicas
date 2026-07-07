@@ -111,6 +111,60 @@ async def test_openalex_null_source_does_not_crash_collection():
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_arxiv_query_gains_industrial_qualifier_when_theme_unscoped():
+    body = (FIXTURES / "arxiv_atom.xml").read_text(encoding="utf-8")
+    route = respx.get(ARXIV_API_URL).mock(return_value=httpx.Response(200, text=body))
+
+    await ArxivCollector().collect("IoT", limit=10, timeout_s=5)
+
+    sent_query = route.calls[0].request.url.params["search_query"]
+    assert sent_query.startswith("all:IoT AND (")
+    assert 'all:"industrial"' in sent_query
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_arxiv_query_unchanged_when_theme_already_industrial():
+    body = (FIXTURES / "arxiv_atom.xml").read_text(encoding="utf-8")
+    route = respx.get(ARXIV_API_URL).mock(return_value=httpx.Response(200, text=body))
+
+    await ArxivCollector().collect("IoT industrial", limit=10, timeout_s=5)
+
+    sent_query = route.calls[0].request.url.params["search_query"]
+    assert sent_query == "all:IoT industrial"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_openalex_query_gains_industrial_qualifier_when_theme_unscoped():
+    import json
+
+    body = json.loads((FIXTURES / "openalex_response.json").read_text(encoding="utf-8"))
+    route = respx.get(OPENALEX_API_URL).mock(return_value=httpx.Response(200, json=body))
+
+    await OpenAlexCollector().collect("IoT", limit=10, timeout_s=5)
+
+    sent_query = route.calls[0].request.url.params["search"]
+    assert sent_query.startswith("IoT AND (")
+    assert '"industrial"' in sent_query
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_openalex_query_unchanged_when_theme_already_industrial():
+    import json
+
+    body = json.loads((FIXTURES / "openalex_response.json").read_text(encoding="utf-8"))
+    route = respx.get(OPENALEX_API_URL).mock(return_value=httpx.Response(200, json=body))
+
+    await OpenAlexCollector().collect("IoT industrial", limit=10, timeout_s=5)
+
+    sent_query = route.calls[0].request.url.params["search"]
+    assert sent_query == "IoT industrial"
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_snippet_truncated_to_500_chars():
     body = (FIXTURES / "arxiv_atom.xml").read_text(encoding="utf-8")
     long_summary = "x" * 1000
